@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Volunteering{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/hospital_volunteering.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="hv-container">
+
+    <!-- About Section -->
+    <div class="section">
+        <div class="section-label">About the program</div>
+        <h2>What is hospital volunteering?</h2>
+        <p>The HPAP Hospital Volunteering Program gives students the opportunity to contribute to healthcare services at
+            Hamad Medical Corporation. Volunteers support medical staff, assist patients, and gain firsthand exposure to
+            the healthcare environment. The program is designed to develop empathy, communication skills, and
+            professional awareness in students who are interested in medicine and healthcare careers.</p>
+    </div>
+
+    <!-- Eligibility Section -->
+    <div class="section">
+        <div class="section-label">Requirements</div>
+        <h2>Eligibility criteria</h2>
+        <p>The program is open to both high school and undergraduate students who meet the following requirements:</p>
+        <div class="eligibility-grid">
+            <div class="elig-card">
+                <h3>High school students</h3>
+                <ul>
+                    <li>Year 10 or above</li>
+                    <li>Minimum GPA of 3.0</li>
+                    <li>Valid QID</li>
+                    <li>Parental consent form</li>
+                    <li>Available on weekdays</li>
+                </ul>
+            </div>
+            <div class="elig-card">
+                <h3>Undergraduate students</h3>
+                <ul>
+                    <li>1st year or above</li>
+                    <li>Enrolled in a recognized institution</li>
+                    <li>Valid QID</li>
+                    <li>Minimum 5 hours per week</li>
+                    <li>Available on weekdays</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- High School Departments -->
+    <div class="section">
+        <div class="section-label">For high school students</div>
+        <h2>Available departments</h2>
+        <div class="dept-grid">
+            {% for dept in highschool_depts %}
+            <div class="dept-card">
+                <span class="badge badge-blue">High School</span>
+                <h3>{{ dept.name }}</h3>
+                <p>{{ dept.location }}</p>
+            </div>
+            {% empty %}
+            <p class="empty-text">No departments available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Undergraduate Departments -->
+    <div class="section">
+        <div class="section-label">For undergraduate students</div>
+        <h2>Available departments</h2>
+        <div class="dept-grid">
+            {% for dept in undergraduate_depts %}
+            <div class="dept-card">
+                <span class="badge badge-green">Undergraduate</span>
+                <h3>{{ dept.name }}</h3>
+                <p>{{ dept.location }}</p>
+            </div>
+            {% empty %}
+            <p class="empty-text">No departments available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Important Notes -->
+    <div class="section">
+        <div class="note">
+            <h3>Important notes</h3>
+            <ul>
+                <li>All volunteering activities take place from Sunday to Thursday only. Friday and Saturday slots are
+                    not available.</li>
+                <li>Each student may hold only one active hospital volunteering placement at a time.</li>
+                <li>Slots are limited per department per week and allocated on a first-come first-served basis upon
+                    staff approval.</li>
+                <li>Undergraduate and graduate students may apply for high school departments.</li>
+                <li>Undergraduate students may also apply for undergraduate-level departments.</li>
+                <li>High school students may only apply for high school departments.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Hero CTA -->
+    <div class="hero">
+        <h2>Ready to start your volunteering journey?</h2>
+        <p>Not sure which department suits you? Let our recommendation tool help you find the best fit before applying.
+        </p>
+        <div class="hero-btns">
+            <a href="{% url 'apply' %}" class="btn-white">Apply Now</a>
+            <a href="{% url 'recommendation' %}" class="btn-outline-white">Get Department Recommendation</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

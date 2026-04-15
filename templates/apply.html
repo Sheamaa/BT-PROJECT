@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apply.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="apply-container">
+
+    <div>
+        <h1 class="page-title">Volunteering Application</h1>
+        <p class="page-subtitle">Complete the form below to apply for a volunteering placement</p>
+    </div>
+
+    <div class="info-banner">
+        Your personal information has been pre-filled from your profile. Please make sure your profile is up to date
+        before submitting.
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Section 1: Personal Info -->
+        <div class="card">
+            <div class="section-label">Section 1</div>
+            <h2 class="section-title">Personal Information</h2>
+            <div class="field-grid">
+                <div class="field-group full">
+                    <label>Full Name</label>
+                    <input type="text" value="{{ profile.full_name }}" readonly>
+                </div>
+                <div class="field-group">
+                    <label>Date of Birth</label>
+                    <input type="text" value="{{ profile.date_of_birth|date:'d / m / Y' }}" readonly>
+                </div>
+                <div class="field-group">
+                    <label>Phone Number</label>
+                    <input type="text" value="{{ profile.phone }}" readonly>
+                </div>
+                <div class="field-group">
+                    <label>QID Number</label>
+                    <input type="text" value="{{ profile.qid }}" readonly>
+                </div>
+                <div class="field-group">
+                    <label>Academic Level</label>
+                    <input type="text" value="{{ profile.academic_level }} — {{ profile.grade_year }}" readonly>
+                </div>
+                <div class="field-group">
+                    <label>Institution</label>
+                    <input type="text" value="{{ profile.institution }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: ID Document -->
+        <div class="card">
+            <div class="section-label">Section 2</div>
+            <h2 class="section-title">ID Document</h2>
+            <p class="section-desc">Your QID document from your profile will be automatically attached to this
+                application.</p>
+            {% if profile.id_document %}
+            <div class="doc-preview">
+                <span class="doc-name">{{ profile.id_document.name }}</span>
+                <span class="doc-badge">From profile</span>
+            </div>
+            {% else %}
+            <div class="doc-missing">
+                No ID document found in your profile.
+                <a href="{% url 'profile' %}">Upload it here</a> before submitting.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Section 3: Department Selection -->
+        <div class="card">
+            <div class="section-label">Section 3</div>
+            <h2 class="section-title">Department Selection</h2>
+            <div class="field-grid">
+                <div class="field-group full">
+                    <label>First Choice Department</label>
+                    <select name="first_choice_dept" required>
+                        <option value="" disabled selected>Select your first choice</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }} — {{ dept.get_area_display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field-group full">
+                    <label>Second Choice Department (optional)</label>
+                    <select name="second_choice_dept">
+                        <option value="">No second choice</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }} — {{ dept.get_area_display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Preferred Week -->
+        <div class="card">
+            <div class="section-label">Section 4</div>
+            <h2 class="section-title">Preferred Volunteering Week</h2>
+            <div class="field-group">
+                <label>Select the Sunday that starts your preferred week</label>
+                <input type="date" name="preferred_week" id="weekPicker" required>
+                <p class="week-note">Volunteering runs Sunday to Thursday only. Fridays and Saturdays are not available.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 5: Additional Documents -->
+        <div class="card">
+            <div class="section-label">Section 5</div>
+            <h2 class="section-title">Additional Documents</h2>
+            <p class="section-desc">Upload any additional documents such as a recommendation letter or consent form.</p>
+            <div class="upload-area" onclick="document.getElementById('extraDocs').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+                <p>Click to upload additional documents</p>
+                <p class="hint">PDF, JPG, or PNG (max 5MB each)</p>
+                <input type="file" id="extraDocs" name="extra_documents" multiple accept=".pdf,.jpg,.jpeg,.png"
+                    onchange="showFiles(this)">
+            </div>
+            <div id="fileList" class="file-list"></div>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Application</button>
+
+    </form>
+</div>
+
+<script>
+    // Only allow Sundays to be selected
+    document.getElementById('weekPicker').addEventListener('change', function () {
+        const date = new Date(this.value);
+        const day = date.getUTCDay();
+        if (day !== 0) {
+            alert('Please select a Sunday as your week start date.');
+            this.value = '';
+        }
+    });
+
+    // Show selected file names
+    function showFiles(input) {
+        const list = document.getElementById('fileList');
+        list.innerHTML = '';
+        Array.from(input.files).forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.textContent = file.name;
+            list.appendChild(item);
+        });
+    }
+</script>
+{% endblock %}

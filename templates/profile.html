@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+{% block title %}My Profile{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="page-title">My Profile</h1>
+
+        <div class="card">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Personal Information -->
+                <div class="section">
+                    <h2 class="section-title">Personal Information</h2>
+                    <div class="field-grid">
+                        <div class="field-group full">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="full_name" value="{{ profile.full_name }}"
+                                placeholder="Enter your full name">
+                        </div>
+                        <div class="field-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="date_of_birth"
+                                value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+                        </div>
+                        <div class="field-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" name="phone" value="{{ profile.phone }}"
+                                placeholder="+974 XXXX XXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Identification -->
+                <div class="section">
+                    <h2 class="section-title">Identification</h2>
+                    <div class="field-grid">
+                        <div class="field-group">
+                            <label for="qidNumber">QID Number</label>
+                            <input type="text" id="qidNumber" name="qid" value="{{ profile.qid }}"
+                                placeholder="Enter QID number">
+                        </div>
+                        <div class="field-group">
+                            <label for="qidExpiry">QID Expiry Date</label>
+                            <input type="date" id="qidExpiry" name="qid_expiry_date"
+                                value="{{ profile.qid_expiry_date|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Academic Information -->
+                <div class="section">
+                    <h2 class="section-title">Academic Information</h2>
+                    <div class="field-grid">
+                        <div class="field-group">
+                            <label for="academicLevel">Academic Level</label>
+                            <select id="academicLevel" name="academic_level">
+                                <option value="" disabled>Select level</option>
+                                <option value="high-school" {% if profile.academic_level == 'high-school' %}selected{%endif %}>High School</option>
+                                <option value="undergraduate" {% if profile.academic_level == 'undergraduate' %}selected{%endif %}>Undergraduate</option>
+                                <option value="postgraduate" {% if profile.academic_level == 'postgraduate' %}selected{%endif %}>Postgraduate</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label for="gradeYear">Grade / Year</label>
+                            <select id="gradeYear" name="grade_year">
+                                <option value="" disabled>Select grade/year</option>
+                                <option value="graduated" {% if profile.grade_year == 'graduated' %}selected{% endif %}>Graduated
+                                </option>
+                                <option value="year-9" {% if profile.grade_year == 'year-9' %}selected{% endif %}>Year 9
+                                </option>
+                                <option value="year-10" {% if profile.grade_year == 'year-10' %}selected{% endif %}>Year
+                                    10</option>
+                                <option value="year-11" {% if profile.grade_year == 'year-11' %}selected{% endif %}>Year
+                                    11</option>
+                                <option value="year-12" {% if profile.grade_year == 'year-12' %}selected{% endif %}>Year
+                                    12</option>
+                                <option value="year-1" {% if profile.grade_year == 'year-1' %}selected{% endif %}>1st Year
+                                </option>
+                                <option value="year-2" {% if profile.grade_year == 'year-2' %}selected{% endif %}>2nd Year
+                                </option>
+                                <option value="year-3" {% if profile.grade_year == 'year-3' %}selected{% endif %}>3rd Year
+                                </option>
+                                <option value="year-4" {% if profile.grade_year == 'year-4' %}selected{% endif %}>4th Year
+                                </option>
+                                <option value="year-5" {% if profile.grade_year == 'year-5' %}selected{% endif %}>5th Year
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label for="institution">Institution</label>
+                            <input type="text" id="institution" name="institution" value="{{ profile.institution }}"
+                                placeholder="Enter your institution">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- QID Document Upload -->
+                <div class="section">
+                    <h2 class="section-title">QID Document</h2>
+                    <div class="upload-area" onclick="document.getElementById('qidFile').click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                        <p>Click to upload your QID document</p>
+                        <p class="hint">PDF, JPG, or PNG (max 5MB)</p>
+                        <input type="file" id="qidFile" name="id_document" accept=".pdf,.jpg,.jpeg,.png"
+                            onchange="handleFile(this)">
+                    </div>
+                    {% if profile.id_document %}
+                    <div class="file-info visible">
+                        <span class="file-name">{{ profile.id_document.name }}</span>
+                        <a href="{{ profile.id_document.url }}" class="view-link" target="_blank">View</a>
+                    </div>
+                    {% endif %}
+                    <div class="file-info" id="fileInfo">
+                        <span class="file-name" id="fileName"></span>
+                        <a href="#" class="view-link" id="viewLink" target="_blank">View</a>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    
+{% endblock %}
+{% block extra_js %}
+<script>
+    function handleFile(input) {
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('viewLink').href = URL.createObjectURL(file);
+            document.getElementById('fileInfo').classList.add('visible');
+        }
+    }
+</script>
+<script>
+    const gradeOptions = {
+        'high-school': [
+            { value: 'graduated', label: 'Graduated' },
+            { value: 'year-9', label: 'Year 9' },
+            { value: 'year-10', label: 'Year 10' },
+            { value: 'year-11', label: 'Year 11' },
+            { value: 'year-12', label: 'Year 12' },
+        ],
+        'undergraduate': [
+            { value: 'graduated', label: 'Graduated' },
+            { value: 'year-1', label: '1st Year' },
+            { value: 'year-2', label: '2nd Year' },
+            { value: 'year-3', label: '3rd Year' },
+            { value: 'year-4', label: '4th Year' },
+            { value: 'year-5', label: '5th Year' },
+        ],
+
+        'postgraduate': [
+            { value: 'graduated', label: 'Graduated' },
+            { value: 'year-1', label: '1st Year' },
+            { value: 'year-2', label: '2nd Year' },
+        ],
+    };
+
+    const academicSelect = document.getElementById('academicLevel');
+    const gradeSelect = document.getElementById('gradeYear');
+    const savedGrade = "{{ profile.grade_year }}";
+
+    function updateGrades(selectedLevel, savedValue = null) {
+        gradeSelect.innerHTML = '<option value="" disabled selected>Select grade/year</option>';
+        const options = gradeOptions[selectedLevel] || [];
+        options.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt.value;
+            el.textContent = opt.label;
+            if (savedValue && opt.value === savedValue) {
+                el.selected = true;
+            }
+            gradeSelect.appendChild(el);
+        });
+    }
+
+    // On page load — if academic level already selected, populate grades
+    if (academicSelect.value) {
+        updateGrades(academicSelect.value, savedGrade);
+    }
+
+    // On change
+    academicSelect.addEventListener('change', function () {
+        updateGrades(this.value);
+    });
+</script>
+{% endblock %}
+</html>

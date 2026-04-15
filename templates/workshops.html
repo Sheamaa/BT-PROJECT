@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Workshops{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/workshops.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="workshops-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Workshops</h1>
+        <p class="page-subtitle">Browse and register for upcoming workshops and training sessions</p>
+    </div>
+
+    {% if workshops %}
+    <div class="workshops-grid">
+        {% for workshop in workshops %}
+        <div class="workshop-card" onclick="openModal('{{ workshop.id }}')">
+            {% if workshop.poster %}
+            <div class="workshop-poster">
+                <img src="{{ workshop.poster.url }}" alt="{{ workshop.name }}">
+            </div>
+            {% else %}
+            <div class="workshop-poster-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            </div>
+            {% endif %}
+            <div class="workshop-info">
+                <div class="workshop-date-badge">
+                    <span class="date-day">{{ workshop.start_date|date:"d" }}</span>
+                    <span class="date-month">{{ workshop.start_date|date:"M" }}</span>
+                </div>
+                <div class="workshop-details">
+                    <h3 class="workshop-name">{{ workshop.name }}</h3>
+                    <p class="workshop-timing">{{ workshop.timings }}</p>
+                    <p class="workshop-dates">
+                        {{ workshop.start_date|date:"M d" }} — {{ workshop.end_date|date:"M d, Y" }}
+                    </p>
+                    <div class="workshop-capacity">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        {{ workshop.capacity }} spots available
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for each workshop -->
+        <div class="modal-overlay" id="modal-{{ workshop.id }}" onclick="closeModal('{{ workshop.id }}')">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <button class="modal-close" onclick="closeModal('{{ workshop.id }}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+
+                {% if workshop.poster %}
+                <div class="modal-poster">
+                    <img src="{{ workshop.poster.url }}" alt="{{ workshop.name }}">
+                </div>
+                {% endif %}
+
+                <div class="modal-info">
+                    <h2 class="modal-title">{{ workshop.name }}</h2>
+                    <p class="modal-desc">{{ workshop.description }}</p>
+
+                    <div class="modal-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>{{ workshop.start_date|date:"M d" }} — {{ workshop.end_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                            <span>{{ workshop.timings }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                            </svg>
+                            <span>{{ workshop.capacity }} spots available</span>
+                        </div>
+                    </div>
+
+                    {% if workshop.id in registered_workshop_ids %}
+                    <div class="already-registered">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20,6 9,17 4,12"></polyline>
+                        </svg>
+                        You are already registered for this workshop
+                    </div>
+                    {% else %}
+                    <form method="POST" action="{% url 'register_workshop' workshop.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="register-btn">Register Now</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        <h3>No upcoming workshops</h3>
+        <p>Check back later for new workshops and training sessions.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+function openModal(id) {
+    document.getElementById('modal-' + id).classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById('modal-' + id).classList.remove('show');
+    document.body.style.overflow = '';
+}
+</script>
+{% endblock %}

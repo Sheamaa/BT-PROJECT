@@ -1,0 +1,240 @@
+.hv-container {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0078c2;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.section h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.section p {
+    font-size: 0.9375rem;
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+.eligibility-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+    .eligibility-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.elig-card {
+    background: #f5f7fa;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.elig-card h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.elig-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.elig-card ul li {
+    font-size: 0.875rem;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.elig-card ul li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0078c2;
+    flex-shrink: 0;
+}
+
+.dept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.dept-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.dept-card h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.dept-card p {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+}
+
+.badge-blue {
+    background: #e6f1fb;
+    color: #0c447c;
+}
+
+.badge-green {
+    background: #eaf3de;
+    color: #27500a;
+}
+
+.note {
+    background: #faeeda;
+    border-left: 4px solid #ba7517;
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+}
+
+.note h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #633806;
+    margin-bottom: 0.5rem;
+}
+
+.note ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+.note ul li {
+    font-size: 0.875rem;
+    color: #854f0b;
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.note ul li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ba7517;
+    flex-shrink: 0;
+    margin-top: 0.45rem;
+}
+
+.empty-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.hero {
+    background: #0078c2;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    color: white;
+    text-align: center;
+}
+
+.hero h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.hero p {
+    font-size: 0.9375rem;
+    opacity: 0.9;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-white {
+    background: white;
+    color: #0078c2;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-white:hover {
+    opacity: 0.9;
+}
+
+.btn-outline-white:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

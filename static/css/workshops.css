@@ -1,0 +1,298 @@
+.workshops-container {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.page-header {
+    text-align: center;
+}
+
+.page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.page-subtitle {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.workshops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.workshop-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.workshop-card:hover {
+    border-color: #0078c2;
+    box-shadow: 0 4px 12px rgba(0, 120, 194, 0.1);
+    transform: translateY(-2px);
+}
+
+.workshop-poster img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.workshop-poster-placeholder {
+    width: 100%;
+    height: 180px;
+    background: #f0f7ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.workshop-poster-placeholder svg {
+    width: 3rem;
+    height: 3rem;
+    color: #0078c2;
+    opacity: 0.4;
+}
+
+.workshop-info {
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.workshop-date-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e6f1fb;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    min-width: 48px;
+    flex-shrink: 0;
+}
+
+.date-day {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0078c2;
+    line-height: 1;
+}
+
+.date-month {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #185fa5;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.workshop-details {
+    flex: 1;
+}
+
+.workshop-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.workshop-timing {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.workshop-dates {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-top: 0.2rem;
+}
+
+.workshop-capacity {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.workshop-capacity svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.modal-close svg {
+    width: 1rem;
+    height: 1rem;
+    color: #6b7280;
+}
+
+.modal-poster img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 16px 16px 0 0;
+    display: block;
+}
+
+.modal-info {
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.modal-desc {
+    font-size: 0.9375rem;
+    color: #4b5563;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
+
+.modal-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.meta-item svg {
+    width: 1rem;
+    height: 1rem;
+    color: #0078c2;
+    flex-shrink: 0;
+}
+
+.already-registered {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #065f46;
+}
+
+.already-registered svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: #0078c2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.register-btn:hover {
+    background: #006aa8;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.empty-state svg {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    font-size: 0.9375rem;
+}

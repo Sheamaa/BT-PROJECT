@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department Recommendation{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/recommendation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="rec-container">
+
+    <div class="rec-header">
+        <h1>Find Your Department</h1>
+        <p>Answer a few questions and we will recommend the most suitable volunteering department for you.</p>
+    </div>
+
+    <div class="rec-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Question 1 -->
+            <div class="question-group">
+                <label class="question-label">1. Where do you currently live?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="area" value="doha" required>
+                        <span>Doha</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="area" value="alwakra">
+                        <span>Al Wakra</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="area" value="alkhor">
+                        <span>Al Khor</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="area" value="dukhan">
+                        <span>Dukhan</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="area" value="doha">
+                        <span>Other</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-group">
+                <label class="question-label">2. Are you willing to travel to hospitals in other areas?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="willing_to_travel" value="yes" required>
+                        <span>Yes, I don't mind travelling</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="willing_to_travel" value="no">
+                        <span>No, I prefer staying close to home</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-group">
+                <label class="question-label">3. Do you have any prior volunteering or healthcare experience?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="prior_experience" value="yes" required>
+                        <span>Yes, I have experience</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="prior_experience" value="no">
+                        <span>No, this is my first time</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-group">
+                <label class="question-label">4. How do you handle stressful or high pressure situations?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="stress_tolerance" value="low" required>
+                        <span>I struggle with stress</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="stress_tolerance" value="medium">
+                        <span>I manage okay</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="stress_tolerance" value="high">
+                        <span>I thrive under pressure</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-group">
+                <label class="question-label">5. How comfortable are you with direct patient interaction?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="patient_interaction" value="not_comfortable" required>
+                        <span>Not comfortable</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="patient_interaction" value="somewhat">
+                        <span>Somewhat comfortable</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="patient_interaction" value="very_comfortable">
+                        <span>Very comfortable</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-group">
+                <label class="question-label">6. Do you prefer working with a specific patient group?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="preference" value="children" required>
+                        <span>Children</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="preference" value="elderly">
+                        <span>Elderly patients</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="preference" value="no_preference">
+                        <span>No preference</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-group">
+                <label class="question-label">7. Are you interested in emergency or critical care environments?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="emergency_interest" value="yes" required>
+                        <span>Yes</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="emergency_interest" value="no">
+                        <span>No</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="emergency_interest" value="not_sure">
+                        <span>Not sure</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-group">
+                <label class="question-label">8. What type of work interests you most?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="work_type" value="technical" required>
+                        <span>Technical or rehabilitation</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="work_type" value="administrative">
+                        <span>Administrative or reception</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="work_type" value="no_preference">
+                        <span>No preference</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Get My Recommendation</button>
+
+        </form>
+    </div>
+
+    <!-- Result Section -->
+    {% if recommended_dept %}
+    <div class="result-card">
+        <div class="result-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+            </svg>
+        </div>
+        <div class="result-info">
+            <p class="result-label">We recommend</p>
+            <h2 class="result-dept">{{ recommended_dept.name }}</h2>
+            <p class="result-location">{{ recommended_dept.location }} — {{ recommended_dept.area }}</p>
+            <p class="result-supervisor">Supervisor: {{ recommended_dept.supervisor }}</p>
+        </div>
+        <a href="{% url 'apply' %}" class="apply-btn">Apply to this department</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

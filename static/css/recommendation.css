@@ -1,0 +1,156 @@
+.rec-container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.rec-header {
+    text-align: center;
+}
+
+.rec-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.rec-header p {
+    font-size: 0.9375rem;
+    color: #6b7280;
+}
+
+.rec-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.question-group {
+    margin-bottom: 2rem;
+}
+
+.question-label {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.options-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #1f2937;
+    transition: all 0.2s;
+}
+
+.option-card:hover {
+    border-color: #0078c2;
+    background: #f0f7ff;
+}
+
+.option-card input[type="radio"] {
+    accent-color: #0078c2;
+}
+
+.option-card:has(input:checked) {
+    border-color: #0078c2;
+    background: #e6f1fb;
+    color: #0c447c;
+    font-weight: 500;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: #0078c2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background: #006aa8;
+}
+
+.result-card {
+    background: white;
+    border: 2px solid #0078c2;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+}
+
+.result-icon svg {
+    width: 3rem;
+    height: 3rem;
+    color: #0078c2;
+}
+
+.result-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.result-dept {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0078c2;
+    margin-top: 0.25rem;
+}
+
+.result-location {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.result-supervisor {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.apply-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: #0078c2;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.apply-btn:hover {
+    background: #006aa8;
+}
