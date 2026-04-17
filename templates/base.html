@@ -16,6 +16,31 @@
 </head>
 
 <body>
+    <nav class="nav">
+        {% if request.user.role == 'staff' %}
+        <a href="{% url 'staff_dashboard' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}nav-link-active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{% url 'staff_departments' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'staff_departments' %}nav-link-active{% endif %}">
+            Departments
+        </a>
+        <a href="{% url 'staff_workshops' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'staff_workshops' %}nav-link-active{% endif %}">
+            Workshops
+        </a>
+        {% else %}
+        <a href="{% url 'dashboard' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}nav-link-active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{% url 'profile' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'profile' %}nav-link-active{% endif %}">
+            Profile
+        </a>
+        {% endif %}
+    </nav>
 
     <header class="header">
         <div class="header-content">

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Workshops{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">Workshops</h1>
+            <p class="page-subtitle">Manage all workshops and training sessions</p>
+        </div>
+        <a href="{% url 'staff_workshop_add' %}" class="add-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Workshop
+        </a>
+    </div>
+
+    <div class="table-card">
+        {% if workshops %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Timings</th>
+                    <th>Capacity</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workshop in workshops %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ workshop.name }}</p>
+                    </td>
+                    <td>{{ workshop.start_date|date:"M d, Y" }}</td>
+                    <td>{{ workshop.end_date|date:"M d, Y" }}</td>
+                    <td>{{ workshop.timings }}</td>
+                    <td>{{ workshop.capacity }}</td>
+                    <td>{{ workshop.registrations.count }}</td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="{% url 'staff_workshop_edit' workshop.id %}" class="view-btn">Edit</a>
+                            <form method="POST" action="{% url 'staff_workshop_delete' workshop.id %}"
+                                onsubmit="return confirm('Are you sure you want to delete this workshop?')">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-table">
+            <p>No workshops found. Add your first workshop!</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

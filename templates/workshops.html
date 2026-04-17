@@ -19,9 +19,10 @@
     <div class="workshops-grid">
         {% for workshop in workshops %}
         <div class="workshop-card" onclick="openModal('{{ workshop.id }}')">
-            {% if workshop.poster %}
+
+            {% if workshop.picture %}
             <div class="workshop-poster">
-                <img src="{{ workshop.poster.url }}" alt="{{ workshop.name }}">
+                <img src="{{ workshop.picture.url }}" alt="{{ workshop.name }}">
             </div>
             {% else %}
             <div class="workshop-poster-placeholder">
@@ -29,8 +30,10 @@
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                 </svg>
+                <p>No image available</p>
             </div>
             {% endif %}
+
             <div class="workshop-info">
                 <div class="workshop-date-badge">
                     <span class="date-day">{{ workshop.start_date|date:"d" }}</span>
@@ -55,7 +58,7 @@
             </div>
         </div>
 
-        <!-- Modal for each workshop -->
+        <!-- Modal -->
         <div class="modal-overlay" id="modal-{{ workshop.id }}" onclick="closeModal('{{ workshop.id }}')">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <button class="modal-close" onclick="closeModal('{{ workshop.id }}')">
@@ -65,9 +68,9 @@
                     </svg>
                 </button>
 
-                {% if workshop.poster %}
+                {% if workshop.picture %}
                 <div class="modal-poster">
-                    <img src="{{ workshop.poster.url }}" alt="{{ workshop.name }}">
+                    <img src="{{ workshop.picture.url }}" alt="{{ workshop.name }}">
                 </div>
                 {% endif %}
 
@@ -101,19 +104,32 @@
                         </div>
                     </div>
 
-                    {% if workshop.id in registered_workshop_ids %}
-                    <div class="already-registered">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20,6 9,17 4,12"></polyline>
-                        </svg>
-                        You are already registered for this workshop
+                    <div class="modal-actions">
+                        {% if workshop.id in registered_workshop_ids %}
+                        <div class="already-registered">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20,6 9,17 4,12"></polyline>
+                            </svg>
+                            You are already registered for this workshop
+                        </div>
+                        {% else %}
+                        <form method="POST" action="{% url 'register_workshop' workshop.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="register-btn">Register Now</button>
+                        </form>
+                        {% endif %}
+
+                        {% if workshop.poster %}
+                        <a href="{{ workshop.poster.url }}" download class="download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download Agenda
+                        </a>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <form method="POST" action="{% url 'register_workshop' workshop.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="register-btn">Register Now</button>
-                    </form>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -134,14 +150,13 @@
 </div>
 
 <script>
-function openModal(id) {
-    document.getElementById('modal-' + id).classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(id) {
-    document.getElementById('modal-' + id).classList.remove('show');
-    document.body.style.overflow = '';
-}
+    function openModal(id) {
+        document.getElementById('modal-' + id).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById('modal-' + id).classList.remove('show');
+        document.body.style.overflow = '';
+    }
 </script>
 {% endblock %}

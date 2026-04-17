@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Workshop{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="back-link">
+        <a href="{% url 'staff_workshops' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Workshops
+        </a>
+    </div>
+
+    <div>
+        <h1 class="page-title">{{ action }} Workshop</h1>
+        <p class="page-subtitle">{% if action == 'Add' %}Create a new workshop{% else %}Update workshop information{%
+            endif %}</p>
+    </div>
+
+    <div class="detail-card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-grid">
+
+                <div class="form-group full">
+                    <label>Workshop Name</label>
+                    <input type="text" name="name" value="{{ workshop.name|default:'' }}" required
+                        placeholder="Enter workshop name">
+                </div>
+
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ workshop.start_date|date:'Y-m-d'|default:'' }}"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ workshop.end_date|date:'Y-m-d'|default:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Timings</label>
+                    <input type="text" name="timings" value="{{ workshop.timings|default:'' }}"
+                        placeholder="e.g. 9:00 AM - 1:00 PM" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" value="{{ workshop.capacity|default:'' }}" required
+                        placeholder="Number of spots">
+                </div>
+
+                <div class="form-group full">
+                    <label>Description</label>
+                    <textarea name="description" rows="4"
+                        placeholder="Describe the workshop...">{{ workshop.description|default:'' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Workshop Picture</label>
+                    {% if workshop.picture %}
+                    <div class="current-file">
+                        <p>Current: <a href="{{ workshop.picture.url }}" target="_blank">View picture</a></p>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="picture" accept="image/*">
+                    <p class="field-hint">Displayed on the workshop card</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Workshop Agenda / Poster</label>
+                    {% if workshop.poster %}
+                    <div class="current-file">
+                        <p>Current: <a href="{{ workshop.poster.url }}" target="_blank">View poster</a></p>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="poster" accept=".pdf,image/*">
+                    <p class="field-hint">Downloadable agenda file (PDF or image)</p>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="approve-btn">
+                    {{ action }} Workshop
+                </button>
+                <a href="{% url 'staff_workshops' %}" class="cancel-btn">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

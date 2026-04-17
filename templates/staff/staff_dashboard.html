@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Staff Dashboard</h1>
+        <p class="page-subtitle">Manage volunteering applications and departments</p>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <p class="stat-label">Total Applications</p>
+            <p class="stat-value">{{ total }}</p>
+        </div>
+        <div class="stat-card stat-pending">
+            <p class="stat-label">Pending Review</p>
+            <p class="stat-value">{{ pending }}</p>
+        </div>
+        <div class="stat-card stat-review">
+            <p class="stat-label">Under Review</p>
+            <p class="stat-value">{{ under_review }}</p>
+        </div>
+        <div class="stat-card stat-approved">
+            <p class="stat-label">Approved</p>
+            <p class="stat-value">{{ approved }}</p>
+        </div>
+        <div class="stat-card stat-rejected">
+            <p class="stat-label">Rejected</p>
+            <p class="stat-value">{{ rejected }}</p>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All</a>
+        <a href="?status=submitted"
+            class="filter-tab {% if status_filter == 'submitted' %}active{% endif %}">Pending</a>
+        <a href="?status=under_review"
+            class="filter-tab {% if status_filter == 'under_review' %}active{% endif %}">Under Review</a>
+        <a href="?status=approved" class="filter-tab {% if status_filter == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=rejected" class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="table-card">
+        {% if applications %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>First Choice</th>
+                    <th>Second Choice</th>
+                    <th>Preferred Week</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ app.student.full_name }}</p>
+                        <p class="student-level">{{ app.student.academic_level }}</p>
+                    </td>
+                    <td>{{ app.first_choice_dept.name }}</td>
+                    <td>{{ app.second_choice_dept.name|default:"—" }}</td>
+                    <td>{{ app.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
+                    <td>{{ app.submitted_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ app.status }}">
+                            {{ app.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_application_detail' app.id %}" class="view-btn">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-table">
+            <p>No applications found.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

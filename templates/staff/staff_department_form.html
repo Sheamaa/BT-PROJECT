@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Department{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="back-link">
+        <a href="{% url 'staff_departments' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Departments
+        </a>
+    </div>
+
+    <div>
+        <h1 class="page-title">{{ action }} Department</h1>
+        <p class="page-subtitle">{% if action == 'Add' %}Create a new department{% else %}Update department
+            information{% endif %}</p>
+    </div>
+
+    <div class="detail-card">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-grid">
+
+                <div class="form-group full">
+                    <label>Department Name</label>
+                    <input type="text" name="name" value="{{ department.name|default:'' }}" required
+                        placeholder="Enter department name">
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="{{ department.location|default:'' }}" required
+                        placeholder="e.g. Hamad General Hospital">
+                </div>
+
+                <div class="form-group">
+                    <label>Area</label>
+                    <select name="area">
+                        <option value="doha" {% if department.area=='doha' %}selected{% endif %}>Doha</option>
+                        <option value="alwakra" {% if department.area=='alwakra' %}selected{% endif %}>Al Wakra</option>
+                        <option value="alkhor" {% if department.area=='alkhor' %}selected{% endif %}>Al Khor</option>
+                        <option value="dukhan" {% if department.area=='dukhan' %}selected{% endif %}>Dukhan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Supervisor</label>
+                    <input type="text" name="supervisor" value="{{ department.supervisor|default:'' }}" required
+                        placeholder="Dr. Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Timings</label>
+                    <input type="text" name="timings" value="{{ department.timings|default:'' }}"
+                        placeholder="e.g. Sun-Thu 8AM-2PM" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Eligibility</label>
+                    <select name="eligibility">
+                        <option value="highschool" {% if department.eligibility=='highschool' %}selected{% endif %}>High
+                            School</option>
+                        <option value="undergraduate" {% if department.eligibility=='undergraduate' %}selected{% endif
+                            %}>Undergraduate</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="has_evening_shift" {% if department.has_evening_shift %}checked{%
+                            endif %}>
+                        Has Evening Shift
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_active" {% if department.is_active or not department %}checked{%
+                            endif %}>
+                        Active (visible to students)
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="approve-btn">
+                    {{ action }} Department
+                </button>
+                <a href="{% url 'staff_departments' %}" class="cancel-btn">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

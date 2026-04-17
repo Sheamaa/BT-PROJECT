@@ -7,6 +7,10 @@ from datetime import date, timedelta
 from .decision_tree import get_recommendation
 
 
+from functools import wraps
+from django.shortcuts import get_object_or_404
+
+
 def auth_page(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -286,6 +290,219 @@ def register_workshop(request, workshop_id):
 
         messages.success(request, f'You have successfully registered for {workshop.name}!')
         return redirect('workshops')
+
+
+# STAFF VIEWS
+
+
+
+def staff_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated or request.user.role != 'staff':
+            messages.error(request, 'You do not have permission to access this page.')
+            return redirect('dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+@login_required
+@staff_required
+def staff_dashboard(request):
+    status_filter = request.GET.get('status', 'all')
+
+    applications = Application.objects.all().order_by('-submitted_at')
+
+    if status_filter != 'all':
+        applications = applications.filter(status=status_filter)
+
+    total = Application.objects.count()
+    pending = Application.objects.filter(status='submitted').count()
+    under_review = Application.objects.filter(status='under_review').count()
+    approved = Application.objects.filter(status='approved').count()
+    rejected = Application.objects.filter(status='rejected').count()
+
+    return render(request, 'staff/staff_dashboard.html', {
+        'applications': applications,
+        'status_filter': status_filter,
+        'total': total,
+        'pending': pending,
+        'under_review': under_review,
+        'approved': approved,
+        'rejected': rejected,
+    })
+
+@login_required
+@staff_required
+def staff_application_detail(request, app_id):
+    application = get_object_or_404(Application, id=app_id)
+    return render(request, 'staff/application_detail.html', {
+        'application': application,
+    })
+
+@login_required
+@staff_required
+def approve_application(request, app_id):
+    if request.method == 'POST':
+        application = get_object_or_404(Application, id=app_id)
+        application.status = 'approved'
+        application.save()
+
+        slot = application.preferred_slot
+        if slot:
+            slot.filled_slots += 1
+            slot.save()
+
+        Notification.objects.create(
+            user=application.student.user,
+            message=f'Congratulations! Your application to {application.first_choice_dept.name} has been approved.',
+            type='application_approved'
+        )
+
+        messages.success(request, f'Application by {application.student.full_name} has been approved.')
+        return redirect('staff_dashboard')
+
+@login_required
+@staff_required
+def reject_application(request, app_id):
+    if request.method == 'POST':
+        application = get_object_or_404(Application, id=app_id)
+        reason = request.POST.get('reason', 'No reason provided.')
+        application.status = 'rejected'
+        application.save()
+
+        Notification.objects.create(
+            user=application.student.user,
+            message=f'Your application to {application.first_choice_dept.name} has been rejected. Reason: {reason}',
+            type='application_rejected'
+        )
+
+        messages.success(request, f'Application by {application.student.full_name} has been rejected.')
+        return redirect('staff_dashboard')
+
+
+@login_required
+@staff_required
+def staff_workshops(request):
+    workshops = Workshop.objects.all().order_by('-start_date')
+    return render(request, 'staff/staff_workshops.html', {
+        'workshops': workshops,
+    })
+
+@login_required
+@staff_required
+def staff_workshop_add(request):
+    if request.method == 'POST':
+        Workshop.objects.create(
+            name=request.POST.get('name'),
+            start_date=request.POST.get('start_date'),
+            end_date=request.POST.get('end_date'),
+            timings=request.POST.get('timings'),
+            description=request.POST.get('description'),
+            capacity=request.POST.get('capacity'),
+            picture=request.FILES.get('picture'),
+            poster=request.FILES.get('poster'),
+        )
+        messages.success(request, 'Workshop added successfully!')
+        return redirect('staff_workshops')
+    return render(request, 'staff/staff_workshop_form.html', {
+        'action': 'Add',
+        'workshop': None,
+    })
+
+@login_required
+@staff_required
+def staff_workshop_edit(request, workshop_id):
+    workshop = get_object_or_404(Workshop, id=workshop_id)
+    if request.method == 'POST':
+        workshop.name = request.POST.get('name')
+        workshop.start_date = request.POST.get('start_date')
+        workshop.end_date = request.POST.get('end_date')
+        workshop.timings = request.POST.get('timings')
+        workshop.description = request.POST.get('description')
+        workshop.capacity = request.POST.get('capacity')
+        if request.FILES.get('picture'):
+            workshop.picture = request.FILES.get('picture')
+        if request.FILES.get('poster'):
+            workshop.poster = request.FILES.get('poster')
+        workshop.save()
+        messages.success(request, 'Workshop updated successfully!')
+        return redirect('staff_workshops')
+    return render(request, 'staff/staff_workshop_form.html', {
+        'action': 'Edit',
+        'workshop': workshop,
+    })
+
+@login_required
+@staff_required
+def staff_workshop_delete(request, workshop_id):
+    if request.method == 'POST':
+        workshop = get_object_or_404(Workshop, id=workshop_id)
+        workshop.delete()
+        messages.success(request, 'Workshop deleted successfully!')
+    return redirect('staff_workshops')
+
+@login_required
+@staff_required
+def staff_departments(request):
+    departments = Department.objects.all().order_by('name')
+    return render(request, 'staff/staff_departments.html', {
+        'departments': departments,
+    })
+
+@login_required
+@staff_required
+def staff_department_add(request):
+    if request.method == 'POST':
+        Department.objects.create(
+            name=request.POST.get('name'),
+            location=request.POST.get('location'),
+            area=request.POST.get('area'),
+            supervisor=request.POST.get('supervisor'),
+            timings=request.POST.get('timings'),
+            eligibility=request.POST.get('eligibility'),
+            has_evening_shift=request.POST.get('has_evening_shift') == 'on',
+            is_active=request.POST.get('is_active') == 'on',
+        )
+        messages.success(request, 'Department added successfully!')
+        return redirect('staff_departments')
+    return render(request, 'staff/staff_department_form.html', {
+        'action': 'Add',
+        'department': None,
+    })
+
+@login_required
+@staff_required
+def staff_department_edit(request, dept_id):
+    department = get_object_or_404(Department, id=dept_id)
+    if request.method == 'POST':
+        department.name = request.POST.get('name')
+        department.location = request.POST.get('location')
+        department.area = request.POST.get('area')
+        department.supervisor = request.POST.get('supervisor')
+        department.timings = request.POST.get('timings')
+        department.eligibility = request.POST.get('eligibility')
+        department.has_evening_shift = request.POST.get('has_evening_shift') == 'on'
+        department.is_active = request.POST.get('is_active') == 'on'
+        department.save()
+        messages.success(request, 'Department updated successfully!')
+        return redirect('staff_departments')
+    return render(request, 'staff/staff_department_form.html', {
+        'action': 'Edit',
+        'department': department,
+    })
+
+@login_required
+@staff_required
+def staff_department_delete(request, dept_id):
+    if request.method == 'POST':
+        department = get_object_or_404(Department, id=dept_id)
+        department.delete()
+        messages.success(request, 'Department deleted successfully!')
+    return redirect('staff_departments')
+
+
+
+
 
 @login_required
 def workshops(request):

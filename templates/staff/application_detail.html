@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Application Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="back-link">
+        <a href="{% url 'staff_dashboard' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="detail-header">
+        <div>
+            <h1 class="page-title">Application Detail</h1>
+            <p class="page-subtitle">Submitted {{ application.submitted_at|date:"M d, Y" }}</p>
+        </div>
+        <span class="status-badge status-{{ application.status }} status-large">
+            {{ application.get_status_display }}
+        </span>
+    </div>
+
+    <!-- Student Info -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Student Information</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <p class="detail-label">Full Name</p>
+                <p class="detail-value">{{ application.student.full_name }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Academic Level</p>
+                <p class="detail-value">{{ application.student.academic_level }} — {{ application.student.grade_year }}
+                </p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Institution</p>
+                <p class="detail-value">{{ application.student.institution }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Phone</p>
+                <p class="detail-value">{{ application.student.phone }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">QID Number</p>
+                <p class="detail-value">{{ application.student.qid }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">QID Expiry</p>
+                <p class="detail-value">{{ application.student.qid_expiry_date|date:"M d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Info -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Application Details</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <p class="detail-label">First Choice Department</p>
+                <p class="detail-value">{{ application.first_choice_dept.name }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Second Choice Department</p>
+                <p class="detail-value">{{ application.second_choice_dept.name|default:"Not specified" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Preferred Week</p>
+                <p class="detail-value">{{ application.preferred_slot.week_start_date|date:"M d, Y"|default:"Not
+                    specified" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Department Supervisor</p>
+                <p class="detail-value">{{ application.first_choice_dept.supervisor }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Department Location</p>
+                <p class="detail-value">{{ application.first_choice_dept.location }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Weekly Slot Availability</p>
+                <p class="detail-value">
+                    {% if application.preferred_slot %}
+                    {{ application.preferred_slot.filled_slots }} / {{ application.preferred_slot.total_slots }} filled
+                    {% else %}
+                    —
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Documents</h2>
+
+        {% if application.student.id_document %}
+        <div class="doc-row">
+            <div class="doc-info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                <div>
+                    <p class="doc-name">QID Document</p>
+                    <p class="doc-source">From student profile</p>
+                </div>
+            </div>
+            <a href="{{ application.student.id_document.url }}" target="_blank" class="doc-view-btn">View</a>
+        </div>
+        {% endif %}
+
+        {% for doc in application.documents.all %}
+        <div class="doc-row">
+            <div class="doc-info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                <div>
+                    <p class="doc-name">{{ doc.document_type }}</p>
+                    <p class="doc-source">Uploaded {{ doc.uploaded_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+            <a href="{{ doc.file.url }}" target="_blank" class="doc-view-btn">View</a>
+        </div>
+        {% empty %}
+        <p class="no-docs">No additional documents uploaded.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    {% if application.status == 'submitted' or application.status == 'under_review' %}
+    <div class="actions-card">
+        <h2 class="detail-section-title">Review Decision</h2>
+
+        <div class="action-buttons">
+            <form method="POST" action="{% url 'approve_application' application.id %}">
+                {% csrf_token %}
+                <button type="submit" class="approve-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20,6 9,17 4,12"></polyline>
+                    </svg>
+                    Approve Application
+                </button>
+            </form>
+
+            <form method="POST" action="{% url 'reject_application' application.id %}" class="reject-form">
+                {% csrf_token %}
+                <div class="reject-reason">
+                    <label>Rejection Reason</label>
+                    <textarea name="reason" placeholder="Please provide a reason for rejection..." rows="3"></textarea>
+                </div>
+                <button type="submit" class="reject-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Reject Application
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
