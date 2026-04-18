@@ -17,7 +17,14 @@ from .email_service import (
 from functools import wraps
 from django.shortcuts import get_object_or_404
 
+def landing_page(request):
+    if request.user.is_authenticated:
+        if request.user.role == 'staff':
+            return redirect('staff_dashboard')
+        return redirect('dashboard')
+    return render(request, 'landing.html')
 
+    
 def auth_page(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -45,6 +52,7 @@ def signup_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         academic_level = request.POST.get('academic_level')
+        role = request.POST.get('role', 'student')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'An account with this email already exists.')
@@ -54,7 +62,7 @@ def signup_view(request):
             username=email,
             email=email,
             password=password,
-            role='student'
+            role=role
         )
         StudentProfile.objects.create(
             user=user,
@@ -66,7 +74,7 @@ def signup_view(request):
         login(request, user)
         return redirect('dashboard')
     return redirect('auth_page')
-
+    
 
 @login_required
 def profile_view(request):
@@ -202,6 +210,14 @@ def apply(request):
             status='submitted'
         )
 
+        staff_users = User.objects.filter(role='staff')
+        for staff in staff_users:
+            Notification.objects.create(
+                user=staff,
+                message=f'New application received from {request.user.student_profile.full_name} for {first_dept.name}.',
+                type='general'
+            )
+
         # handle additional documents
         for file in request.FILES.getlist('extra_documents'):
             ApplicationDocument.objects.create(
@@ -209,6 +225,7 @@ def apply(request):
                 file=file,
                 document_type='additional'
             )
+        
 
         # create notification for student
         Notification.objects.create(
@@ -552,13 +569,13 @@ def staff_volunteering_documents(request):
         file = request.FILES.get('file')
         if name and file:
             if documents.count() >= 2:
-                messages.error(request, 'You can only have 2 onboarding documents. Please delete one first.')
+                messages.error(request, 'You can only have 2 volunteering documents. Please delete one first.')
             else:
                 VolunteeringDocument.objects.create(name=name, file=file)
                 messages.success(request, 'Document uploaded successfully!')
-        return redirect('staff_onboarding_documents')
+        return redirect('staff_volunteering_documents')
 
-    return render(request, 'staff/staff_onboarding_documents.html', {
+    return render(request, 'staff/staff_volunteering_documents.html', {
         'documents': documents,
     })
 
@@ -703,6 +720,13 @@ def student_upload_attendance(request, app_id):
             )
             messages.success(request, 'Attendance sheet uploaded successfully!')
             return redirect('dashboard')
+    staff_users = User.objects.filter(role='staff')
+    for staff in staff_users:
+        Notification.objects.create(
+            user=staff,
+            message=f'{request.user.student_profile.full_name} uploaded an attendance sheet for {application.first_choice_dept.name}.',
+            type='general'
+        )
     return render(request, 'student_upload_attendance.html', {
         'application': application,
     })

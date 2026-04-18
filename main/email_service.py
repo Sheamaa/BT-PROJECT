@@ -93,7 +93,7 @@ Activity Details:
 - Supervisor: {department.supervisor}
 - Timings: {department.timings}
 
-Please find the attached onboarding documents. You will need to fill out the attendance sheet and upload it to the system after completing your volunteering activity.
+Please find the attached volunteering documents. You will need to fill out the attendance sheet and upload it to the system after completing your volunteering activity.
 
 We look forward to having you as part of our volunteering team.
 
@@ -106,8 +106,8 @@ HPAP Team
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[user.email],
     )
-    onboarding_docs = VolunteeringDocument.objects.all()
-    for doc in onboarding_docs:
+    volunteering_docs = VolunteeringDocument.objects.all()
+    for doc in volunteering_docs:
         try:
             doc.file.open()
             email.attach(doc.name, doc.file.read(), 'application/octet-stream')

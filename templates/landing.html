@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPAP Hospital Volunteering Program</title>
+    <meta name="description" content="Apply and get matched to the best hospital volunteering department for you">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <nav class="navbar-container">
+            <a href="{% url 'landing_page' %}" class="logo">
+                <div class="logo-icon"><span>H</span></div>
+                <span class="logo-text">HPAP</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'auth_page' %}" class="btn btn-ghost">Login</a>
+                <a href="{% url 'auth_page' %}" class="btn btn-primary">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">HPAP Hospital Volunteering Program</h1>
+        <p class="hero-subtitle">Apply and get matched to the best department for you</p>
+        <div class="hero-buttons">
+            <a href="{% url 'auth_page' %}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{% url 'auth_page' %}" class="btn btn-outline btn-lg">Login</a>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section class="program-section">
+        <div class="program-container">
+            <div class="program-card">
+                <div class="program-grid">
+                    <div class="program-image">
+                        <img src="{% static 'imgs/hospital-volunteering.jpg' %}" alt=" volunteers">
+                    </div>
+                    <div class="program-content">
+                        <h2 class="program-title">Hospital Volunteering</h2>
+                        <p class="program-description">
+                            Join our community of dedicated volunteers making a difference in healthcare. Gain valuable
+                            experience while helping patients and staff.
+                        </p>
+                        <div class="program-button">
+                            <a href="{% url 'auth_page' %}" class="btn btn-accent">Register Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <p class="about-text">
+                This platform helps students apply and get matched to suitable volunteering departments efficiently.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="footer-title">HPAP Hospital Volunteering Program</p>
+            <p class="footer-text">© 2026</p>
+            <p class="footer-text">contact@hpap-volunteer.org</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

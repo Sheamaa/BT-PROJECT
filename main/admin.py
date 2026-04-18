@@ -56,13 +56,13 @@ class WorkshopAdmin(admin.ModelAdmin):
 class WorkshopRegistrationAdmin(admin.ModelAdmin):
     list_display = ['student', 'workshop', 'status', 'registered_at']
 
-@admin.register(VolunteeringDocument)
-class VolunteeringDocumentAdmin(admin.ModelAdmin):
-    list_display = ['student', 'document_type', 'uploaded_at']
-
 @admin.register(AttendanceSheet)
 class AttendanceSheetAdmin(admin.ModelAdmin):
-    list_display = ['student', 'department', 'week_start_date', 'hours']
+    list_display = ['application', 'status', 'uploaded_at']
+
+@admin.register(VolunteeringDocument)
+class VolunteeringDocumentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'uploaded_at']
 
 @admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):

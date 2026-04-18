@@ -8,13 +8,13 @@
 <div class="staff-container">
     <div class="page-header-row">
         <div>
-            <h1 class="page-title">Onboarding Documents</h1>
+            <h1 class="page-title">Volunteers Documents</h1>
             <p class="page-subtitle">These documents are automatically attached to every approval email</p>
         </div>
     </div>
 
     <div class="detail-card">
-        <h2 class="detail-section-title">Current Documents ({{ documents.count }}/2)</h2>
+        <h2 class="detail-section-title">Current Documents ({{ documents.count }}/5)</h2>
         {% if documents %}
         {% for doc in documents %}
         <div class="doc-row">
@@ -30,7 +30,7 @@
             </div>
             <div style="display:flex;gap:0.75rem;align-items:center">
                 <a href="{{ doc.file.url }}" target="_blank" class="doc-view-btn">View</a>
-                <form method="POST" action="{% url 'staff_delete_onboarding_document' doc.id %}"
+                <form method="POST" action="{% url 'staff_delete_volunteering_document' doc.id %}"
                     onsubmit="return confirm('Delete this document?')">
                     {% csrf_token %}
                     <button type="submit" class="delete-btn">Delete</button>
@@ -39,11 +39,11 @@
         </div>
         {% endfor %}
         {% else %}
-        <p class="no-docs">No onboarding documents uploaded yet.</p>
+        <p class="no-docs">No volunteers documents uploaded yet.</p>
         {% endif %}
     </div>
 
-    {% if documents.count < 2 %} <div class="detail-card">
+    {% if documents.count < 5 %} <div class="detail-card">
         <h2 class="detail-section-title">Upload New Document</h2>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -64,7 +64,7 @@
 </div>
 {% else %}
 <div class="info-banner" style="background:#e6f1fb;border-left-color:#0078c2;color:#0c447c">
-    You have reached the maximum of 2 onboarding documents. Delete one to upload a new one.
+    You have reached the maximum of 5 volunteering documents. Delete one to upload a new one.
 </div>
 {% endif %}
 </div>

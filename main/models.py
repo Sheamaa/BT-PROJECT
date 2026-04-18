@@ -206,14 +206,14 @@ class Certificate(models.Model):
     ]
     activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPE_CHOICES)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='certificates')
-    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='certificate')
-    workshop_registration = models.OneToOneField(WorkshopRegistration, on_delete=models.CASCADE, related_name='certificate')
+    application = models.OneToOneField(Application, on_delete=models.SET_NULL, null=True, blank=True, related_name='certificate')
+    workshop_registration = models.OneToOneField(WorkshopRegistration, on_delete=models.SET_NULL, null=True, blank=True, related_name='certificate')
     department_name = models.CharField(max_length=100)
     start_date = models.DateField()
     hours = models.IntegerField()
     certificate_file = models.FileField(upload_to='certificates/')
     issued_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"Certificate - {self.student.full_name}"
     

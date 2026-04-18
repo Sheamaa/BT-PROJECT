@@ -1,0 +1,349 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #0078c2;
+    --primary-foreground: #ffffff;
+    --accent: #6dc63c;
+    --accent-foreground: #ffffff;
+    --foreground: #1f2937;
+    --muted-foreground: #6b7280;
+    --background: #ffffff;
+    --muted: #f5f7fa;
+    --border: #e5e7eb;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--foreground);
+    background-color: var(--background);
+    min-height: 100vh;
+}
+
+/* ==================== NAVBAR ==================== */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.navbar-container {
+    max-width: 1152px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding: 0 16px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary);
+    border-radius: 8px;
+}
+
+.logo-icon span {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-foreground);
+}
+
+.logo-text {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-lg {
+    padding: 12px 32px;
+    font-size: 16px;
+}
+
+.btn-ghost {
+    background-color: transparent;
+    color: var(--muted-foreground);
+}
+
+.btn-ghost:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--foreground);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.btn-primary:hover {
+    background-color: #006aad;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background-color: rgba(0, 120, 194, 0.05);
+}
+
+.btn-accent {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+}
+
+.btn-accent:hover {
+    background-color: #5db832;
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 96px 16px;
+}
+
+.hero-title {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--foreground);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+}
+
+.hero-subtitle {
+    margin-top: 16px;
+    max-width: 448px;
+    color: var(--muted-foreground);
+    font-size: 16px;
+}
+
+.hero-buttons {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ==================== PROGRAM SECTION ==================== */
+.program-section {
+    background-color: var(--muted);
+    padding: 64px 16px;
+}
+
+.program-container {
+    max-width: 896px;
+    margin: 0 auto;
+}
+
+.program-card {
+    background-color: var(--background);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.program-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.program-image {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+}
+
+.program-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.program-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.program-title {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.program-description {
+    margin-top: 12px;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+}
+
+.program-button {
+    margin-top: 24px;
+}
+
+/* ==================== ABOUT SECTION ==================== */
+.about-section {
+    padding: 48px 16px;
+}
+
+.about-container {
+    max-width: 672px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-text {
+    color: var(--muted-foreground);
+    line-height: 1.6;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 16px;
+}
+
+.footer-container {
+    max-width: 896px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footer-title {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+.footer-text {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+/* ==================== RESPONSIVE - TABLET & UP ==================== */
+@media (min-width: 640px) {
+    .hero-buttons {
+        flex-direction: row;
+        gap: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero {
+        padding: 128px 16px;
+    }
+
+    .hero-title {
+        font-size: 36px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+    }
+
+    .program-section {
+        padding: 80px 16px;
+    }
+
+    .program-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .program-image {
+        aspect-ratio: auto;
+        min-height: 300px;
+    }
+
+    .program-content {
+        padding: 32px;
+    }
+
+    .program-title {
+        font-size: 24px;
+    }
+
+    .about-section {
+        padding: 64px 16px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 48px;
+    }
+}
+
+/* ==================== RESPONSIVE - MOBILE ==================== */
+@media (max-width: 640px) {
+    .navbar-container {
+        padding: 0 12px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+
+    .nav-links {
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .btn-lg {
+        padding: 10px 24px;
+        font-size: 14px;
+    }
+}

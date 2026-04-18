@@ -120,6 +120,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+
+LOGIN_URL = '/auth/'
+
 STATIC_URL = "static/"
 
 AUTH_USER_MODEL = 'main.User'
@@ -130,3 +133,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_gmail@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_app_password_here'
+DEFAULT_FROM_EMAIL = 'your_gmail@gmail.com'
