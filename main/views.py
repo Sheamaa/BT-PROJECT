@@ -5,6 +5,13 @@ from .models import User, StudentProfile, Workshop, Department, Recommendation, 
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from .decision_tree import get_recommendation
+from .models import User, StudentProfile, StaffProfile, Workshop, Department, Recommendation, Application, ApplicationDocument, DepartmentWeeklySlot, Notification, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, Certificate
+from .email_service import (
+    send_application_submitted_email,
+    send_application_approved_email,
+    send_application_rejected_email,
+    send_workshop_registration_email,
+)
 
 
 from functools import wraps
@@ -96,13 +103,16 @@ def dashboard(request):
     try:
         profile = request.user.student_profile
         applications = profile.applications.all().order_by('-submitted_at')
+        certificates = profile.certificates.all().order_by('-issued_at')
     except:
         profile = None
         applications = []
+        certificates = []
 
     return render(request, 'dashboard.html', {
         'profile': profile,
         'applications': applications,
+        'certificates': certificates,
     })
 
 
@@ -357,6 +367,23 @@ def approve_application(request, app_id):
             message=f'Congratulations! Your application to {application.first_choice_dept.name} has been approved.',
             type='application_approved'
         )
+        send_application_approved_email(application.student.user, application.first_choice_dept)
+        messages.success(request, f'Application by {application.student.full_name} has been approved.')
+        return redirect('staff_dashboard')
+        application = get_object_or_404(Application, id=app_id)
+        application.status = 'approved'
+        application.save()
+
+        slot = application.preferred_slot
+        if slot:
+            slot.filled_slots += 1
+            slot.save()
+
+        Notification.objects.create(
+            user=application.student.user,
+            message=f'Congratulations! Your application to {application.first_choice_dept.name} has been approved.',
+            type='application_approved'
+        )
 
         messages.success(request, f'Application by {application.student.full_name} has been approved.')
         return redirect('staff_dashboard')
@@ -512,3 +539,170 @@ def workshops(request):
 def logout_view(request):
     logout(request)
     return redirect('auth_page')
+
+
+
+
+@login_required
+@staff_required
+def staff_volunteering_documents(request):
+    documents = VolunteeringDocument.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        file = request.FILES.get('file')
+        if name and file:
+            if documents.count() >= 2:
+                messages.error(request, 'You can only have 2 onboarding documents. Please delete one first.')
+            else:
+                VolunteeringDocument.objects.create(name=name, file=file)
+                messages.success(request, 'Document uploaded successfully!')
+        return redirect('staff_onboarding_documents')
+
+    return render(request, 'staff/staff_onboarding_documents.html', {
+        'documents': documents,
+    })
+
+
+@login_required
+@staff_required
+def staff_delete_volunteering_document(request, doc_id):
+    if request.method == 'POST':
+        doc = get_object_or_404(VolunteeringDocument, id=doc_id)
+        doc.delete()
+        messages.success(request, 'Document deleted successfully!')
+    return redirect('staff_volunteering_documents')
+
+
+@login_required
+@staff_required
+def staff_attendance_list(request):
+    status_filter = request.GET.get('status', 'all')
+    sheets = AttendanceSheet.objects.all().order_by('-uploaded_at')
+    if status_filter != 'all':
+        sheets = sheets.filter(status=status_filter)
+    return render(request, 'staff/staff_attendance.html', {
+        'sheets': sheets,
+        'status_filter': status_filter,
+    })
+
+
+@login_required
+@staff_required
+def staff_verify_attendance(request, sheet_id):
+    sheet = get_object_or_404(AttendanceSheet, id=sheet_id)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        note = request.POST.get('staff_note', '')
+        if action == 'verify':
+            sheet.status = 'verified'
+            sheet.staff_note = note
+            sheet.save()
+            Notification.objects.create(
+                user=sheet.application.student.user,
+                message=f'Your attendance sheet for {sheet.application.first_choice_dept.name} has been verified. Your certificate will be issued soon.',
+                type='general'
+            )
+            messages.success(request, 'Attendance sheet verified successfully!')
+        elif action == 'reject':
+            sheet.status = 'rejected'
+            sheet.staff_note = note
+            sheet.save()
+            Notification.objects.create(
+                user=sheet.application.student.user,
+                message=f'Your attendance sheet for {sheet.application.first_choice_dept.name} was rejected. Reason: {note}',
+                type='general'
+            )
+            messages.success(request, 'Attendance sheet rejected.')
+    return redirect('staff_attendance_list')
+
+
+@login_required
+@staff_required
+def staff_certificates_list(request):
+    pending_verification = AttendanceSheet.objects.filter(status='verified').exclude(
+        application__certificate__isnull=False
+    )
+    issued_certificates = Certificate.objects.all().order_by('-issued_at')
+    return render(request, 'staff/staff_certificates.html', {
+        'pending_verification': pending_verification,
+        'issued_certificates': issued_certificates,
+    })
+
+
+@login_required
+@staff_required
+def staff_upload_certificate(request, app_id):
+    application = get_object_or_404(Application, id=app_id)
+    if request.method == 'POST':
+        Certificate.objects.create(
+            activity_type='hospital',
+            student=application.student,
+            application=application,
+            department_name=request.POST.get('department_name'),
+            start_date=request.POST.get('start_date'),
+            hours=request.POST.get('hours'),
+            certificate_file=request.FILES.get('certificate_file'),
+        )
+        Notification.objects.create(
+            user=application.student.user,
+            message=f'Your certificate for {application.first_choice_dept.name} has been issued. You can download it from your dashboard.',
+            type='general'
+        )
+        messages.success(request, 'Certificate uploaded successfully!')
+        return redirect('staff_certificates_list')
+    return render(request, 'staff/staff_certificate_form.html', {
+        'application': application,
+        'type': 'hospital',
+    })
+
+
+@login_required
+@staff_required
+def staff_upload_workshop_certificate(request, reg_id):
+    registration = get_object_or_404(WorkshopRegistration, id=reg_id)
+    if request.method == 'POST':
+        Certificate.objects.create(
+            activity_type='workshop',
+            student=registration.student,
+            workshop_registration=registration,
+            department_name=registration.workshop.name,
+            start_date=request.POST.get('start_date'),
+            hours=request.POST.get('hours'),
+            certificate_file=request.FILES.get('certificate_file'),
+        )
+        Notification.objects.create(
+            user=registration.student.user,
+            message=f'Your certificate for {registration.workshop.name} has been issued. You can download it from your dashboard.',
+            type='general'
+        )
+        messages.success(request, 'Certificate uploaded successfully!')
+        return redirect('staff_certificates_list')
+    return render(request, 'staff/staff_certificate_form.html', {
+        'registration': registration,
+        'type': 'workshop',
+    })
+
+
+@login_required
+def student_upload_attendance(request, app_id):
+    application = get_object_or_404(Application, id=app_id, student=request.user.student_profile)
+    if hasattr(application, 'attendance_sheet'):
+        messages.error(request, 'You have already uploaded an attendance sheet for this application.')
+        return redirect('dashboard')
+    if request.method == 'POST':
+        file = request.FILES.get('attendance_file')
+        if file:
+            AttendanceSheet.objects.create(
+                application=application,
+                file=file,
+            )
+            Notification.objects.create(
+                user=request.user,
+                message=f'Your attendance sheet for {application.first_choice_dept.name} has been uploaded and is pending verification.',
+                type='general'
+            )
+            messages.success(request, 'Attendance sheet uploaded successfully!')
+            return redirect('dashboard')
+    return render(request, 'student_upload_attendance.html', {
+        'application': application,
+    })

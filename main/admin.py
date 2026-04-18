@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     User, StudentProfile, StaffProfile, Department,
     DepartmentWeeklySlot, Application, ApplicationDocument,
-    Recommendation, Notification, Workshop, WorkshopRegistration
+    Recommendation, Notification, Workshop, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, Certificate
 )
 
 
@@ -55,3 +55,15 @@ class WorkshopAdmin(admin.ModelAdmin):
 @admin.register(WorkshopRegistration)
 class WorkshopRegistrationAdmin(admin.ModelAdmin):
     list_display = ['student', 'workshop', 'status', 'registered_at']
+
+@admin.register(VolunteeringDocument)
+class VolunteeringDocumentAdmin(admin.ModelAdmin):
+    list_display = ['student', 'document_type', 'uploaded_at']
+
+@admin.register(AttendanceSheet)
+class AttendanceSheetAdmin(admin.ModelAdmin):
+    list_display = ['student', 'department', 'week_start_date', 'hours']
+
+@admin.register(Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    list_display = ['student', 'department_name', 'start_date', 'hours']

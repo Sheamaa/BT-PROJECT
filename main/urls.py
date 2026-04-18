@@ -15,6 +15,7 @@ urlpatterns = [
     path('recommendation/', views.recommendation, name='recommendation'),
     path('workshops/', views.workshops, name='workshops'),
     path('workshops/register/<int:workshop_id>/', views.register_workshop, name='register_workshop'),
+    path('student/upload-attendance/<int:app_id>/', views.student_upload_attendance, name='student_upload_attendance'),
     # Staff URLs
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
     path('staff/application/<int:app_id>/', views.staff_application_detail, name='staff_application_detail'),
@@ -28,4 +29,12 @@ urlpatterns = [
     path('staff/departments/add/', views.staff_department_add, name='staff_department_add'),
     path('staff/departments/<int:dept_id>/edit/', views.staff_department_edit, name='staff_department_edit'),
     path('staff/departments/<int:dept_id>/delete/', views.staff_department_delete, name='staff_department_delete'),
+    path('staff/volunteering-documents/', views.staff_volunteering_documents, name='staff_volunteering_documents'),
+    path('staff/attendance/', views.staff_attendance_list, name='staff_attendance_list'),
+    path('staff/attendance/<int:sheet_id>/verify/', views.staff_verify_attendance, name='staff_verify_attendance'),
+    path('staff/certificates/', views.staff_certificates_list, name='staff_certificates_list'),
+    path('staff/certificates/upload/<int:app_id>/', views.staff_upload_certificate, name='staff_upload_certificate'),
+    path('staff/certificates/upload-workshop/<int:reg_id>/', views.staff_upload_workshop_certificate, name='staff_upload_workshop_certificate'),
+    path('staff/volunteering-documents/<int:doc_id>/delete/', views.staff_delete_volunteering_document, name='staff_delete_volunteering_document'),
+
 ]

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Certificates{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+    <div>
+        <h1 class="page-title">Certificates</h1>
+        <p class="page-subtitle">Upload certificates for students with verified attendance</p>
+    </div>
+
+    {% if pending_verification %}
+    <div class="detail-card">
+        <h2 class="detail-section-title">Pending Certificate Upload</h2>
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Department</th>
+                    <th>Week</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sheet in pending_verification %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ sheet.application.student.full_name }}</p>
+                    </td>
+                    <td>{{ sheet.application.first_choice_dept.name }}</td>
+                    <td>{{ sheet.application.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'staff_upload_certificate' sheet.application.id %}" class="view-btn">Upload
+                            Certificate</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="detail-card">
+        <h2 class="detail-section-title">Issued Certificates</h2>
+        {% if issued_certificates %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Type</th>
+                    <th>Department / Workshop</th>
+                    <th>Start Date</th>
+                    <th>Hours</th>
+                    <th>Issued</th>
+                    <th>File</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in issued_certificates %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ cert.student.full_name }}</p>
+                    </td>
+                    <td>
+                        <span
+                            class="status-badge {% if cert.activity_type == 'hospital' %}status-submitted{% else %}status-approved{% endif %}">
+                            {{ cert.get_activity_type_display }}
+                        </span>
+                    </td>
+                    <td>{{ cert.department_name }}</td>
+                    <td>{{ cert.start_date|date:"M d, Y" }}</td>
+                    <td>{{ cert.hours }} hrs</td>
+                    <td>{{ cert.issued_at|date:"M d, Y" }}</td>
+                    <td><a href="{{ cert.certificate_file.url }}" target="_blank" class="doc-view-btn">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-table">
+            <p>No certificates issued yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

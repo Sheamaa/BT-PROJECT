@@ -208,3 +208,78 @@
     font-weight: 500;
     font-size: 0.875rem;
 }
+
+
+.total-hours-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #e6f1fb;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    color: #0c447c;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.total-hours-banner svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.activities-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.activities-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.activities-table th {
+    background: #f5f7fa;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.activities-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #f5f7fa;
+    color: #1f2937;
+}
+
+.activities-table tr:last-child td {
+    border-bottom: none;
+}
+
+.total-hours-row {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.75rem;
+    padding-right: 0.5rem;
+}
+
+.upload-attendance-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0f7ff;
+    border: 1px solid #b5d4f4;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    color: #0c447c;
+    margin-top: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}

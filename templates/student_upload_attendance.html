@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Upload Attendance Sheet{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apply.css' %}">{% endblock %}
+
+{% block content %}
+<div class="apply-container">
+    <div class="back-link" style="margin-bottom:1rem">
+        <a href="{% url 'dashboard' %}"
+            style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.875rem;color:#0078c2;font-weight:500;text-decoration:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:1rem;height:1rem">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div>
+        <h1 class="page-title">Upload Attendance Sheet</h1>
+        <p class="page-subtitle">{{ application.first_choice_dept.name }} — {{
+            application.preferred_slot.week_start_date|date:"M d, Y" }}</p>
+    </div>
+
+    <div class="info-banner">
+        Please upload your completed and signed attendance sheet. The staff will verify it and issue your certificate
+        accordingly.
+    </div>
+
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-area" onclick="document.getElementById('attendanceFile').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+                <p>Click to upload your attendance sheet</p>
+                <p class="hint">PDF, JPG, or PNG (max 5MB)</p>
+                <input type="file" id="attendanceFile" name="attendance_file" accept=".pdf,.jpg,.jpeg,.png" required
+                    onchange="showFile(this)">
+            </div>
+            <div id="fileInfo"
+                style="display:none;margin-top:1rem;background:#f0f7ff;border:1px solid #b5d4f4;border-radius:8px;padding:0.875rem 1rem">
+                <p id="fileName" style="font-size:0.875rem;font-weight:500;color:#0c447c"></p>
+            </div>
+            <button type="submit" class="submit-btn" style="margin-top:1.5rem">Submit Attendance Sheet</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showFile(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('fileName').textContent = input.files[0].name;
+            document.getElementById('fileInfo').style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}

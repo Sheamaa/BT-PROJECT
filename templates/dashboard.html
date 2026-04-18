@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -107,6 +108,91 @@
         </div>
         {% endif %}
 
+    </div>
+
+    <!-- Activities Section -->
+    <div class="section">
+        <h2 class="section-title">My Activities & Certificates</h2>
+    
+        {% if certificates %}
+        {% with total_hours=certificates|length %}
+        <div class="total-hours-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12,6 12,12 16,14"></polyline>
+            </svg>
+            Total Volunteering Hours:
+            <strong>{{ certificates|sum_hours }} hrs</strong>
+        </div>
+        {% endwith %}
+    
+        <div class="activities-table-wrapper">
+            <table class="activities-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Department / Workshop</th>
+                        <th>Start Date</th>
+                        <th>Hours</th>
+                        <th>Certificate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cert in certificates %}
+                    <tr>
+                        <td>
+                            <span
+                                class="status-badge {% if cert.activity_type == 'hospital' %}status-submitted{% else %}status-approved{% endif %}">
+                                {{ cert.get_activity_type_display }}
+                            </span>
+                        </td>
+                        <td>{{ cert.department_name }}</td>
+                        <td>{{ cert.start_date|date:"M d, Y" }}</td>
+                        <td>{{ cert.hours }} hrs</td>
+                        <td>
+                            <a href="{{ cert.certificate_file.url }}" target="_blank" class="doc-view-btn">Download</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="total-hours-row">
+            Total hours:
+            <strong>
+                {% for cert in certificates %}{% if forloop.last %}{{ cert.hours }}{% endif %}{% endfor %}
+            </strong>
+        </div>
+    
+        {% else %}
+        <div class="empty-state">
+            <p>No completed activities yet. Your certificates will appear here once issued.</p>
+        </div>
+        {% endif %}
+    
+        <!-- Upload attendance for approved applications -->
+        {% for app in applications %}
+        {% if app.status == 'approved' %}
+        {% if not app.attendance_sheet %}
+        <div class="upload-attendance-banner">
+            <p>You have an approved application for <strong>{{ app.first_choice_dept.name }}</strong>. Upload your
+                attendance sheet after completing your activity.</p>
+            <a href="{% url 'student_upload_attendance' app.id %}" class="view-btn">Upload Attendance Sheet</a>
+        </div>
+        {% elif app.attendance_sheet.status == 'pending' %}
+        <div class="upload-attendance-banner" style="background:#faeeda;border-color:#ba7517">
+            <p>Your attendance sheet for <strong>{{ app.first_choice_dept.name }}</strong> is pending verification.</p>
+        </div>
+        {% elif app.attendance_sheet.status == 'verified' %}
+        <div class="upload-attendance-banner" style="background:#eaf3de;border-color:#3b6d11">
+            <p>Your attendance sheet for <strong>{{ app.first_choice_dept.name }}</strong> has been verified. Your
+                certificate will be issued soon.</p>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    
     </div>
 
 </div>
