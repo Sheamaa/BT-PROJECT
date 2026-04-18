@@ -163,8 +163,8 @@ def apply(request):
             status__in=['submitted', 'under_review', 'approved']
         ).first()
 
-        if active_application:
-            messages.error(request, 'You already have an active application. You cannot submit another one until it is resolved.')
+        if active_application and active_application.preferred_slot == preferred_week:
+            messages.error(request, 'You already have an active application for this week. You may choose another week where you are free.')
             return redirect('dashboard')
 
         # get or create the weekly slot

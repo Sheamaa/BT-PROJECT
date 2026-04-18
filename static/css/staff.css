@@ -24,7 +24,7 @@
 /* Stats */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
 
@@ -227,7 +227,7 @@
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 1.75rem;
+    padding: 2rem;
 }
 
 .detail-section-title {
@@ -478,7 +478,7 @@
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    gap: 2rem;
     margin-bottom: 2rem;
 }
 

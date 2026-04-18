@@ -175,3 +175,52 @@ class WorkshopRegistration(models.Model):
 
     def __str__(self):
         return f"{self.student.full_name} - {self.workshop.name}"
+
+
+class VolunteeringDocument(models.Model):
+    name = models.CharField(max_length=100)
+    file = models.FileField(upload_to='volunteering_documents/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.name}"
+
+
+class AttendanceSheet(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    ]
+    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='attendance_sheet')
+    file = models.FileField(upload_to='attendance_sheets/')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    staff_note = models.TextField(null=True, blank=True)
+    def __str__(self):
+       return f"Attendance - {self.application.student.full_name}"
+
+class Certificate(models.Model):
+    ACTIVITY_TYPE_CHOICES = [
+        ('workshop', 'Workshop'),
+        ('hospital', 'Hospital Volunteering'),
+    ]
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPE_CHOICES)
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='certificates')
+    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='certificate')
+    workshop_registration = models.OneToOneField(WorkshopRegistration, on_delete=models.CASCADE, related_name='certificate')
+    department_name = models.CharField(max_length=100)
+    start_date = models.DateField()
+    hours = models.IntegerField()
+    certificate_file = models.FileField(upload_to='certificates/')
+    issued_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Certificate - {self.student.full_name}"
+    
+
+# class Feedback(models.Model):
+#     application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='feedback')
+#     feedback = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return f"Feedback - {self.application.student.full_name}"

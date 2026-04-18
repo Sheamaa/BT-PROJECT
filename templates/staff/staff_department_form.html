@@ -46,10 +46,10 @@
                 <div class="form-group">
                     <label>Area</label>
                     <select name="area">
-                        <option value="doha" {% if department.area=='doha' %}selected{% endif %}>Doha</option>
-                        <option value="alwakra" {% if department.area=='alwakra' %}selected{% endif %}>Al Wakra</option>
-                        <option value="alkhor" {% if department.area=='alkhor' %}selected{% endif %}>Al Khor</option>
-                        <option value="dukhan" {% if department.area=='dukhan' %}selected{% endif %}>Dukhan</option>
+                        <option value="doha" {% if department.area == 'doha' %}selected{% endif %}>Doha</option>
+                        <option value="alwakra" {% if department.area == 'alwakra' %}selected{% endif %}>Al Wakra</option>
+                        <option value="alkhor" {% if department.area == 'alkhor' %}selected{% endif %}>Al Khor</option>
+                        <option value="dukhan" {% if department.area == 'dukhan' %}selected{% endif %}>Dukhan</option>
                     </select>
                 </div>
 
@@ -68,25 +68,22 @@
                 <div class="form-group">
                     <label>Eligibility</label>
                     <select name="eligibility">
-                        <option value="highschool" {% if department.eligibility=='highschool' %}selected{% endif %}>High
+                        <option value="highschool" {% if department.eligibility == 'highschool' %}selected{% endif %}>High
                             School</option>
-                        <option value="undergraduate" {% if department.eligibility=='undergraduate' %}selected{% endif
-                            %}>Undergraduate</option>
+                        <option value="undergraduate" {% if department.eligibility == 'undergraduate' %}selected{% endif%}>Undergraduate</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" name="has_evening_shift" {% if department.has_evening_shift %}checked{%
-                            endif %}>
+                        <input type="checkbox" name="has_evening_shift" {% if department.has_evening_shift %}checked{%endif %}>
                         Has Evening Shift
                     </label>
                 </div>
 
                 <div class="form-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" name="is_active" {% if department.is_active or not department %}checked{%
-                            endif %}>
+                        <input type="checkbox" name="is_active" {% if department.is_active or not department %}checked{%endif %}>
                         Active (visible to students)
                     </label>
                 </div>

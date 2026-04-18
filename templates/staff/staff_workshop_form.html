@@ -22,8 +22,13 @@
 
     <div>
         <h1 class="page-title">{{ action }} Workshop</h1>
-        <p class="page-subtitle">{% if action == 'Add' %}Create a new workshop{% else %}Update workshop information{%
-            endif %}</p>
+        <p class="page-subtitle">
+            {% if action == 'Add' %}
+            Create a new workshop
+            {% else %}
+            Update workshop information
+            {% endif %}
+        </p>
     </div>
 
     <div class="detail-card">
