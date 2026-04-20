@@ -37,5 +37,8 @@ urlpatterns = [
     path('staff/certificates/upload/<int:app_id>/', views.staff_upload_certificate, name='staff_upload_certificate'),
     path('staff/certificates/upload-workshop/<int:reg_id>/', views.staff_upload_workshop_certificate, name='staff_upload_workshop_certificate'),
     path('staff/volunteering-documents/<int:doc_id>/delete/', views.staff_delete_volunteering_document, name='staff_delete_volunteering_document'),
+    path('staff/export/', views.export_approved_excel, name='export_approved_excel'),
+    path('staff/students/', views.staff_students, name='staff_students'),
+    path('staff/students/<int:student_id>/', views.staff_student_detail, name='staff_student_detail'),
 
 ]

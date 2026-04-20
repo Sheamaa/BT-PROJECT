@@ -142,18 +142,77 @@
     {% if application.status == 'submitted' or application.status == 'under_review' %}
     <div class="actions-card">
         <h2 class="detail-section-title">Review Decision</h2>
-
+    
+        <!-- Slot availability summary -->
+        <div class="slot-summary">
+    
+            <div class="slot-card">
+                <p class="slot-title">First choice — {{ application.first_choice_dept.name }}</p>
+                {% if application.preferred_slot %}
+                {% if application.preferred_slot.is_full %}
+                <p class="slot-status slot-full">Full — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.total_slots }} slots filled</p>
+                {% else %}
+                <p class="slot-status slot-available">Available — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.total_slots }} slots filled</p>
+                {% endif %}
+                {% else %}
+                <p class="slot-status slot-available">No slot record yet</p>
+                {% endif %}
+            </div>
+    
+            {% if application.second_choice_dept %}
+            <div class="slot-card">
+                <p class="slot-title">Second choice — {{ application.second_choice_dept.name }}</p>
+                {% with second_slot=application.second_choice_dept.weekly_slots.all %}
+                {% for slot in second_slot %}
+                {% if slot.week_start_date == application.preferred_slot.week_start_date %}
+                {% if slot.is_full %}
+                <p class="slot-status slot-full">Full — {{ slot.filled_slots }}/{{ slot.total_slots }} slots filled</p>
+                {% else %}
+                <p class="slot-status slot-available">Available — {{ slot.filled_slots }}/{{ slot.total_slots }} slots
+                    filled</p>
+                {% endif %}
+                {% endif %}
+                {% empty %}
+                <p class="slot-status slot-available">No slot record yet — slots available</p>
+                {% endfor %}
+                {% endwith %}
+            </div>
+            {% endif %}
+    
+        </div>
+    
         <div class="action-buttons">
+    
+            <!-- Approve for first choice -->
             <form method="POST" action="{% url 'approve_application' application.id %}">
                 {% csrf_token %}
-                <button type="submit" class="approve-btn">
+                <input type="hidden" name="choice" value="first">
+                <button type="submit" class="approve-btn" {% if application.preferred_slot and application.preferred_slot.is_full %} style="opacity:0.5;cursor:not-allowed" disabled {% endif %}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20,6 9,17 4,12"></polyline>
                     </svg>
-                    Approve Application
+                    Approve — {{ application.first_choice_dept.name }}
+                    {% if application.preferred_slot and application.preferred_slot.is_full %}
+                    (Full)
+                    {% endif %}
                 </button>
             </form>
-
+    
+            <!-- Approve for second choice if exists -->
+            {% if application.second_choice_dept %}
+            <form method="POST" action="{% url 'approve_application' application.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="choice" value="second">
+                <button type="submit" class="approve-btn" style="background:#0f6e56">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20,6 9,17 4,12"></polyline>
+                    </svg>
+                    Approve — {{ application.second_choice_dept.name }} (2nd choice)
+                </button>
+            </form>
+            {% endif %}
+    
+            <!-- Reject -->
             <form method="POST" action="{% url 'reject_application' application.id %}" class="reject-form">
                 {% csrf_token %}
                 <div class="reject-reason">
@@ -168,6 +227,7 @@
                     Reject Application
                 </button>
             </form>
+    
         </div>
     </div>
     {% endif %}

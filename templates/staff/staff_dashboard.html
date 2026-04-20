@@ -15,7 +15,7 @@
         <p class="page-subtitle">Manage volunteering applications and departments</p>
     </div>
 
-    <!-- Overview Cards -->
+    <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card">
             <p class="stat-label">Total Applications</p>
@@ -39,15 +39,106 @@
         </div>
     </div>
 
-    <!-- Filter Tabs -->
-    <div class="filter-tabs">
-        <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All</a>
-        <a href="?status=submitted"
-            class="filter-tab {% if status_filter == 'submitted' %}active{% endif %}">Pending</a>
-        <a href="?status=under_review"
-            class="filter-tab {% if status_filter == 'under_review' %}active{% endif %}">Under Review</a>
-        <a href="?status=approved" class="filter-tab {% if status_filter == 'approved' %}active{% endif %}">Approved</a>
-        <a href="?status=rejected" class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
+    <!-- Filters -->
+    <div class="filters-card">
+        <form method="GET" class="filters-form">
+            <div class="filters-grid">
+
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All statuses</option>
+                        <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>Pending
+                        </option>
+                        <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>Under
+                            Review</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Department</label>
+                    <select name="department" onchange="this.form.submit()">
+                        <option value="all" {% if department_filter == 'all' %}selected{% endif %}>All departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if department_filter == dept.id|stringformat:'s' %}selected{%endif %}>
+                            {{ dept.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Week</label>
+                    <select name="week" onchange="this.form.submit()">
+                        <option value="all" {% if week_filter == 'all' %}selected{% endif %}>All weeks</option>
+                        {% for week in weeks %}
+                        <option value="{{ week|date:'Y-m-d' }}" {% if week_filter == week|date:'Y-m-d' %}selected{% endif %}>
+                            {{ week|date:"M d, Y" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Academic Level</label>
+                    <select name="level" onchange="this.form.submit()">
+                        <option value="all" {% if level_filter == 'all' %}selected{% endif %}>All levels</option>
+                        <option value="high-school" {% if level_filter == 'high-school' %}selected{% endif %}>High School
+                        </option>
+                        <option value="undergraduate" {% if level_filter == 'undergraduate' %}selected{% endif %}>
+                            Undergraduate</option>
+                        <option value="graduate" {% if level_filter == 'graduate' %}selected{% endif %}>Graduate</option>
+                        <option value="postgraduate" {% if level_filter == 'postgraduate' %}selected{% endif %}>
+                            Postgraduate</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="filters-actions">
+                <a href="{% url 'staff_dashboard' %}" class="clear-btn">Clear filters</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-card">
+        <h2 class="detail-section-title">Export Approved Volunteers</h2>
+        <p style="font-size:0.875rem;color:#6b7280;margin-bottom:1rem">
+            Download a formatted Excel file of approved volunteers filtered by department and week.
+        </p>
+        <form method="GET" action="{% url 'export_approved_excel' %}" class="export-form">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Department</label>
+                    <select name="department">
+                        <option value="">All departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Week</label>
+                    <select name="week">
+                        <option value="">All weeks</option>
+                        {% for week in weeks %}
+                        <option value="{{ week }}">{{ week|date:"M d, Y" }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="export-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Excel
+            </button>
+        </form>
     </div>
 
     <!-- Applications Table -->
@@ -90,7 +181,7 @@
         </table>
         {% else %}
         <div class="empty-table">
-            <p>No applications found.</p>
+            <p>No applications found matching your filters.</p>
         </div>
         {% endif %}
     </div>

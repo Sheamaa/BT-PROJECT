@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Students{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Students</h1>
+        <p class="page-subtitle">All registered students — {{ total_students }} total</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+        <form method="GET" class="filters-form">
+            <div class="filters-grid">
+
+                <div class="filter-group">
+                    <label>Search by QID</label>
+                    <input type="text" name="search" value="{{ search }}" placeholder="Enter QID number..."
+                        style="height:2.5rem;padding:0 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.875rem;width:100%">
+                </div>
+
+                <div class="filter-group">
+                    <label>Academic Level</label>
+                    <select name="level" onchange="this.form.submit()">
+                        <option value="all" {% if level_filter == 'all' %}selected{% endif %}>All levels</option>
+                        <option value="high-school" {% if level_filter == 'high-school' %}selected{% endif %}>High School
+                        </option>
+                        <option value="undergraduate" {% if level_filter == 'undergraduate' %}selected{% endif %}>
+                            Undergraduate</option>
+                        <option value="graduate" {% if level_filter == 'graduate' %}selected{% endif %}>Graduate</option>
+                        <option value="postgraduate" {% if level_filter == 'postgraduate' %}selected{% endif %}>
+                            Postgraduate</option>
+                    </select>
+                </div>
+
+                <div class="filter-group"
+                    style="justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:0.5rem">
+                    <button type="submit" class="approve-btn"
+                        style="padding:0.5rem 1.25rem;font-size:0.875rem">Search</button>
+                    <a href="{% url 'staff_students' %}" class="clear-btn">Clear</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- Students Table -->
+    <div class="table-card">
+        {% if student_data %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Institution</th>
+                    <th>Academic Level</th>
+                    <th>Applications</th>
+                    <th>Approved</th>
+                    <th>Certificates</th>
+                    <th>Total Hours</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in student_data %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ item.student.full_name }}</p>
+                        <p class="student-level">{{ item.student.user.email }}</p>
+                    </td>
+                    <td>{{ item.student.institution|default:"—" }}</td>
+                    <td>
+                        <span
+                            class="status-badge {% if item.student.academic_level == 'high-school' %}status-submitted{% else %}status-approved{% endif %}">
+                            {{ item.student.academic_level }}
+                        </span>
+                    </td>
+                    <td>{{ item.total_applications }}</td>
+                    <td>{{ item.approved_applications }}</td>
+                    <td>{{ item.total_certificates }}</td>
+                    <td>
+                        {% if item.total_hours > 0 %}
+                        <span style="font-weight:600;color:#3b6d11">{{ item.total_hours }} hrs</span>
+                        {% else %}
+                        <span style="color:#6b7280">0 hrs</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_student_detail' item.student.id %}" class="view-btn">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-table">
+            <p>No students found.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

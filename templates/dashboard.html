@@ -65,20 +65,30 @@
 
         {% if applications %}
         <div class="applications-list">
-            {% for app in applications %}
-            <div class="application-card">
-                <div class="app-info">
-                    <h3 class="app-dept">{{ app.first_choice_dept.name }}</h3>
-                    <p class="app-date">Submitted {{ app.submitted_at|date:"M d, Y" }}</p>
-                    {% if app.second_choice_dept %}
-                    <p class="app-second">2nd choice: {{ app.second_choice_dept.name }}</p>
-                    {% endif %}
-                </div>
-                <div class="app-status status-{{ app.status }}">
-                    {{ app.get_status_display }}
-                </div>
+        {% for app in applications %}
+        <div class="application-card">
+            <div class="app-info">
+        
+                {% if app.status == 'approved' and app.approved_department %}
+                <h3 class="app-dept">{{ app.approved_department.name }}</h3>
+                <p class="app-accepted-label">Accepted department</p>
+                {% if app.approved_department != app.first_choice_dept %}
+                <p class="app-second">Originally 2nd choice</p>
+                {% endif %}
+                {% else %}
+                <h3 class="app-dept">{{ app.first_choice_dept.name }}</h3>
+                {% if app.second_choice_dept %}
+                <p class="app-second">2nd choice: {{ app.second_choice_dept.name }}</p>
+                {% endif %}
+                {% endif %}
+        
+                <p class="app-date">Submitted {{ app.submitted_at|date:"M d, Y" }}</p>
             </div>
-            {% endfor %}
+            <div class="app-status status-{{ app.status }}">
+                {{ app.get_status_display }}
+            </div>
+        </div>
+        {% endfor %}
         </div>
         {% else %}
         <div class="empty-state">

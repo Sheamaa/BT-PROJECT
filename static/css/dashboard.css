@@ -283,3 +283,10 @@
     gap: 1rem;
     flex-wrap: wrap;
 }
+
+.app-accepted-label {
+    font-size: 0.8125rem;
+    color: #3b6d11;
+    font-weight: 500;
+    margin-top: 0.2rem;
+}

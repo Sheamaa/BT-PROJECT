@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ student.full_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="back-link">
+        <a href="{% url 'staff_students' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Students
+        </a>
+    </div>
+
+    <!-- Student Header -->
+    <div class="student-header-card">
+        <div class="student-avatar">
+            {% if student.profile_picture %}
+            <img src="{{ student.profile_picture.url }}" alt="{{ student.full_name }}">
+            {% else %}
+            <div class="avatar-placeholder">{{ student.full_name|first|upper }}</div>
+            {% endif %}
+        </div>
+        <div class="student-header-info">
+            <h1 class="page-title">{{ student.full_name }}</h1>
+            <p class="page-subtitle">{{ student.user.email }}</p>
+            <div class="student-badges">
+                <span
+                    class="status-badge {% if student.academic_level == 'high-school' %}status-submitted{% else %}status-approved{% endif %}">
+                    {{ student.academic_level }}
+                </span>
+                {% if student.grade_year %}
+                <span class="status-badge status-under_review">{{ student.grade_year }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="student-hours-summary">
+            <p class="stat-label">Total Hours</p>
+            <p class="stat-value" style="color:#3b6d11">{{ total_hours }}</p>
+        </div>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Personal Information</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <p class="detail-label">Full Name</p>
+                <p class="detail-value">{{ student.full_name }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Email</p>
+                <p class="detail-value">{{ student.user.email }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Phone</p>
+                <p class="detail-value">{{ student.phone|default:"—" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Date of Birth</p>
+                <p class="detail-value">{{ student.date_of_birth|date:"M d, Y"|default:"—" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">QID Number</p>
+                <p class="detail-value">{{ student.qid|default:"—" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">QID Expiry</p>
+                <p class="detail-value">{{ student.qid_expiry_date|date:"M d, Y"|default:"—" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Institution</p>
+                <p class="detail-value">{{ student.institution|default:"—" }}</p>
+            </div>
+            <div class="detail-item">
+                <p class="detail-label">Academic Level</p>
+                <p class="detail-value">{{ student.academic_level }} {% if student.grade_year %}— {{ student.grade_year
+                    }}{% endif %}</p>
+            </div>
+        </div>
+
+        {% if student.id_document %}
+        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #e5e7eb">
+            <p class="detail-label" style="margin-bottom:0.5rem">QID Document</p>
+            <a href="{{ student.id_document.url }}" target="_blank" class="doc-view-btn">View QID Document</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Applications History -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Applications History ({{ applications.count }})</h2>
+        {% if applications %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>First Choice</th>
+                    <th>Second Choice</th>
+                    <th>Approved Department</th>
+                    <th>Week</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.first_choice_dept.name }}</td>
+                    <td>{{ app.second_choice_dept.name|default:"—" }}</td>
+                    <td>
+                        {% if app.approved_department %}
+                        <span style="color:#3b6d11;font-weight:500">{{ app.approved_department.name }}</span>
+                        {% else %}
+                        <span style="color:#6b7280">—</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ app.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
+                    <td>{{ app.submitted_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ app.status }}">
+                            {{ app.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_application_detail' app.id %}" class="view-btn">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-docs">No applications submitted yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Workshop Registrations -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Workshop Registrations ({{ workshop_registrations.count }})</h2>
+        {% if workshop_registrations %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Workshop</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Registered</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in workshop_registrations %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ reg.workshop.name }}</p>
+                    </td>
+                    <td>{{ reg.workshop.start_date|date:"M d, Y" }}</td>
+                    <td>{{ reg.workshop.end_date|date:"M d, Y" }}</td>
+                    <td>{{ reg.registered_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span
+                            class="status-badge {% if reg.status == 'registered' %}status-submitted{% elif reg.status == 'attended' %}status-approved{% else %}status-rejected{% endif %}">
+                            {{ reg.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-docs">No workshop registrations yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Certificates and Activities -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Certificates & Activities ({{ certificates.count }})</h2>
+        {% if certificates %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Department / Workshop</th>
+                    <th>Start Date</th>
+                    <th>Hours</th>
+                    <th>Issued</th>
+                    <th>Certificate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in certificates %}
+                <tr>
+                    <td>
+                        <span
+                            class="status-badge {% if cert.activity_type == 'hospital' %}status-submitted{% else %}status-approved{% endif %}">
+                            {{ cert.get_activity_type_display }}
+                        </span>
+                    </td>
+                    <td>{{ cert.department_name }}</td>
+                    <td>{{ cert.start_date|date:"M d, Y" }}</td>
+                    <td><span style="font-weight:600;color:#3b6d11">{{ cert.hours }} hrs</span></td>
+                    <td>{{ cert.issued_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{{ cert.certificate_file.url }}" target="_blank" class="doc-view-btn">Download</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align:right;margin-top:1rem;padding-top:1rem;border-top:1px solid #e5e7eb">
+            <span style="font-size:0.875rem;color:#6b7280">Total volunteering hours: </span>
+            <span style="font-size:1rem;font-weight:700;color:#3b6d11">{{ total_hours }} hrs</span>
+        </div>
+
+        {% else %}
+        <p class="no-docs">No certificates issued yet.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

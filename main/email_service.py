@@ -6,44 +6,29 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 def send_application_submitted_email(user, department_name):
+    print("EMAIL FUNCTION CALLED") 
     send_mail(
         subject='Application Submitted — HPAP Volunteering',
         message=f'''
-Dear {user.student_profile.full_name},
+        Dear {user.student_profile.full_name},
 
-Your volunteering application to {department_name} has been successfully submitted.
-Our team will review your application and notify you of the decision shortly.
+        Your volunteering application to {department_name} has been successfully submitted.
+        Our team will review your application and notify you of the decision shortly.
 
-Thank you for your interest in the HPAP Volunteering Program.
+        Thank you for your interest in the HPAP Volunteering Program.
 
-Best regards,
-HPAP Team
+        Best regards,
+        HPAP Team
         ''',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
-        fail_silently=True,
+        fail_silently=False,
     )
 
-def send_application_approved_email(user, department_name):
-    send_mail(
-        subject='Application Approved — HPAP Volunteering',
-        message=f'''
-Dear {user.student_profile.full_name},
 
-Congratulations! Your volunteering application to {department_name} has been approved.
-Please check your dashboard for further details and next steps.
-
-We look forward to having you as part of our volunteering team.
-
-Best regards,
-HPAP Team
-        ''',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=True,
-    )
 
 def send_application_rejected_email(user, department_name, reason):
+    print("REJECT FUNCTION CALLED") 
     send_mail(
         subject='Application Update — HPAP Volunteering',
         message=f'''
@@ -60,7 +45,7 @@ HPAP Team
         ''',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
-        fail_silently=True,
+        fail_silently=False,
     )
 
 def send_workshop_registration_email(user, workshop_name):
@@ -77,10 +62,11 @@ HPAP Team
         ''',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
-        fail_silently=True,
+        fail_silently=False,
     )
 
 def send_application_approved_email(user, department):
+    print("APPROVED FUNCTION CALLED") 
     subject = 'Application Approved — HPAP Volunteering'
     body = f'''
 Dear {user.student_profile.full_name},
@@ -114,4 +100,4 @@ HPAP Team
             doc.file.close()
         except Exception:
             pass
-    email.send(fail_silently=True)
+    email.send(fail_silently=False)

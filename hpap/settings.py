@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,7 +128,7 @@ STATIC_URL = "static/"
 
 AUTH_USER_MODEL = 'main.User'
 
-import os
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -139,6 +140,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_gmail@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password_here'
-DEFAULT_FROM_EMAIL = 'your_gmail@gmail.com'
+EMAIL_HOST_USER = "elahosten@gmail.com"
+EMAIL_HOST_PASSWORD = "xyuvzcrzszcforas"
+DEFAULT_FROM_EMAIL = "elahosten@gmail.com"
+
+
+
+# Password reset configuration
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24  # 24 hours
+PASSWORD_RESET_URL = '/auth/reset/confirm/'

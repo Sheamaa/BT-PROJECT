@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import User, StudentProfile, Workshop, Department, Recommendation, DepartmentWeeklySlot, ApplicationDocument, Application, Notification, Workshop, WorkshopRegistration
 from django.contrib.auth.decorators import login_required
-from datetime import date, timedelta
+from datetime import date, datetime
 from .decision_tree import get_recommendation
 from .models import User, StudentProfile, StaffProfile, Workshop, Department, Recommendation, Application, ApplicationDocument, DepartmentWeeklySlot, Notification, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, Certificate
 from .email_service import (
@@ -12,10 +12,13 @@ from .email_service import (
     send_application_rejected_email,
     send_workshop_registration_email,
 )
-
-
 from functools import wraps
 from django.shortcuts import get_object_or_404
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.http import HttpResponse
+
+
 
 def landing_page(request):
     if request.user.is_authenticated:
@@ -74,7 +77,7 @@ def signup_view(request):
         login(request, user)
         return redirect('dashboard')
     return redirect('auth_page')
-    
+
 
 @login_required
 def profile_view(request):
@@ -336,11 +339,35 @@ def staff_required(view_func):
 @staff_required
 def staff_dashboard(request):
     status_filter = request.GET.get('status', 'all')
+    department_filter = request.GET.get('department', 'all')
+    week_filter = request.GET.get('week', 'all')
+    level_filter = request.GET.get('level', 'all')
 
     applications = Application.objects.all().order_by('-submitted_at')
 
     if status_filter != 'all':
         applications = applications.filter(status=status_filter)
+
+    if department_filter != 'all':
+        applications = applications.filter(
+            first_choice_dept_id=department_filter
+        )
+
+    if week_filter and week_filter != 'all':
+        for fmt in ['%Y-%m-%d', '%B %d, %Y', '%b %d, %Y', '%April %d, %Y']:
+            try:
+                week_date = datetime.strptime(week_filter.strip(), fmt).date()
+                applications = applications.filter(
+                    preferred_slot__week_start_date=week_date
+                )
+                break
+            except ValueError:
+                continue
+
+    if level_filter != 'all':
+        applications = applications.filter(
+            student__academic_level=level_filter
+        )
 
     total = Application.objects.count()
     pending = Application.objects.filter(status='submitted').count()
@@ -348,14 +375,24 @@ def staff_dashboard(request):
     approved = Application.objects.filter(status='approved').count()
     rejected = Application.objects.filter(status='rejected').count()
 
+    departments = Department.objects.filter(is_active=True).order_by('name')
+    weeks = DepartmentWeeklySlot.objects.values_list(
+        'week_start_date', flat=True
+    ).distinct().order_by('week_start_date')
+
     return render(request, 'staff/staff_dashboard.html', {
         'applications': applications,
         'status_filter': status_filter,
+        'department_filter': department_filter,
+        'week_filter': week_filter,
+        'level_filter': level_filter,
         'total': total,
         'pending': pending,
         'under_review': under_review,
         'approved': approved,
         'rejected': rejected,
+        'departments': departments,
+        'weeks': weeks,
     })
 
 @login_required
@@ -371,39 +408,66 @@ def staff_application_detail(request, app_id):
 def approve_application(request, app_id):
     if request.method == 'POST':
         application = get_object_or_404(Application, id=app_id)
-        application.status = 'approved'
-        application.save()
+        choice = request.POST.get('choice', 'first')
 
-        slot = application.preferred_slot
-        if slot:
-            slot.filled_slots += 1
-            slot.save()
+        if choice == 'second' and application.second_choice_dept:
+            approved_dept = application.second_choice_dept
+
+            if application.preferred_slot:
+                week_date = application.preferred_slot.week_start_date
+                slot, created = DepartmentWeeklySlot.objects.get_or_create(
+                    department=approved_dept,
+                    week_start_date=week_date,
+                    defaults={'total_slots': 5, 'filled_slots': 0}
+                )
+                if slot.is_full():
+                    messages.error(request, f'{approved_dept.name} is also full for this week.')
+                    return redirect('staff_application_detail', app_id=app_id)
+                application.status = 'approved'
+                application.approved_department = approved_dept
+                application.save()
+                slot.filled_slots += 1
+                slot.save()
+            else:
+                application.status = 'approved'
+                application.approved_department = approved_dept
+                application.save()
+
+        else:
+            approved_dept = application.first_choice_dept
+            slot = application.preferred_slot
+
+            if slot and slot.is_full():
+                messages.error(
+                    request,
+                    f'{approved_dept.name} is full for this week. Please approve for second choice instead.'
+                )
+                return redirect('staff_application_detail', app_id=app_id)
+
+            application.status = 'approved'
+            application.approved_department = approved_dept
+            application.save()
+
+            if slot:
+                slot.filled_slots += 1
+                slot.save()
 
         Notification.objects.create(
             user=application.student.user,
-            message=f'Congratulations! Your application to {application.first_choice_dept.name} has been approved.',
-            type='application_approved'
-        )
-        send_application_approved_email(application.student.user, application.first_choice_dept)
-        messages.success(request, f'Application by {application.student.full_name} has been approved.')
-        return redirect('staff_dashboard')
-        application = get_object_or_404(Application, id=app_id)
-        application.status = 'approved'
-        application.save()
-
-        slot = application.preferred_slot
-        if slot:
-            slot.filled_slots += 1
-            slot.save()
-
-        Notification.objects.create(
-            user=application.student.user,
-            message=f'Congratulations! Your application to {application.first_choice_dept.name} has been approved.',
+            message=f'Congratulations! Your application has been approved. You will be volunteering at {approved_dept.name}.',
             type='application_approved'
         )
 
-        messages.success(request, f'Application by {application.student.full_name} has been approved.')
+        try:
+            send_application_approved_email(application.student.user, approved_dept)
+        except Exception:
+            pass
+
+        messages.success(request, f'Application approved for {approved_dept.name}.')
         return redirect('staff_dashboard')
+
+
+
 
 @login_required
 @staff_required
@@ -729,4 +793,218 @@ def student_upload_attendance(request, app_id):
         )
     return render(request, 'student_upload_attendance.html', {
         'application': application,
+    })
+
+
+
+@login_required
+@staff_required
+def export_approved_excel(request):
+    department_id = request.GET.get('department')
+    week = request.GET.get('week')
+
+    applications = Application.objects.filter(
+        status='approved'
+    ).order_by('student__full_name')
+
+    if department_id:
+        applications = applications.filter(
+            approved_department_id=department_id
+        )
+
+    if week:
+        try:
+            from datetime import datetime, date
+            # handle both formats just in case
+            for fmt in ['%Y-%m-%d', '%B %d, %Y', '%b %d, %Y']:
+                try:
+                    week_date = datetime.strptime(week.strip(), fmt).date()
+                    applications = applications.filter(
+                        preferred_slot__week_start_date=week_date
+                    )
+                    break
+                except ValueError:
+                    continue
+        except Exception:
+            pass
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Approved Volunteers'
+
+    header_font = Font(bold=True, color='FFFFFF', size=12)
+    header_fill = PatternFill(
+        start_color='0078C2',
+        end_color='0078C2',
+        fill_type='solid'
+    )
+    header_alignment = Alignment(horizontal='center', vertical='center')
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    ws.merge_cells('A1:H1')
+    title_cell = ws['A1']
+    title_cell.value = 'HPAP Volunteering Program — Approved Volunteers List'
+    title_cell.font = Font(bold=True, size=14, color='0078C2')
+    title_cell.alignment = Alignment(horizontal='center', vertical='center')
+    ws.row_dimensions[1].height = 30
+
+    if department_id:
+        try:
+            dept = Department.objects.get(id=department_id)
+            ws.merge_cells('A2:H2')
+            dept_cell = ws['A2']
+            dept_cell.value = f'Department: {dept.name} — {dept.location}'
+            dept_cell.font = Font(bold=True, size=11)
+            dept_cell.alignment = Alignment(horizontal='center')
+        except Department.DoesNotExist:
+            pass
+
+    if week:
+        ws.merge_cells('A3:H3')
+        week_cell = ws['A3']
+        week_cell.value = f'Week Starting: {week}'
+        week_cell.font = Font(size=11)
+        week_cell.alignment = Alignment(horizontal='center')
+
+    headers = [
+        'No.',
+        'Full Name',
+        'QID Number',
+        'Academic Level',
+        'Institution',
+        'Phone',
+        'Email',
+        'Department',
+        'Week Start Date',
+    ]
+
+    header_row = 5
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=header_row, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
+        cell.border = thin_border
+
+    ws.row_dimensions[header_row].height = 20
+
+    alt_fill = PatternFill(
+        start_color='E6F1FB',
+        end_color='E6F1FB',
+        fill_type='solid'
+    )
+
+    for row_num, app in enumerate(applications, 1):
+        row = header_row + row_num
+        data = [
+            row_num,
+            app.student.full_name,
+            app.student.qid,
+            app.student.academic_level,
+            app.student.institution,
+            app.student.phone,
+            app.student.user.email,
+            app.approved_department.name if app.approved_department else app.first_choice_dept.name,
+            str(app.preferred_slot.week_start_date) if app.preferred_slot else '—',
+        ]
+        for col, value in enumerate(data, 1):
+            cell = ws.cell(row=row, column=col, value=value)
+            cell.border = thin_border
+            cell.alignment = Alignment(vertical='center')
+            if row_num % 2 == 0:
+                cell.fill = alt_fill
+
+        ws.row_dimensions[row].height = 18
+
+    column_widths = [6, 30, 20, 20, 18, 20, 30, 30, 20]
+    for col, width in enumerate(column_widths, 1):
+        ws.column_dimensions[
+            openpyxl.utils.get_column_letter(col)
+        ].width = width
+
+    total_row = header_row + len(applications) + 2
+    ws.cell(
+        row=total_row,
+        column=1,
+        value=f'Total: {len(applications)} volunteers'
+    ).font = Font(bold=True)
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    dept_name = 'all'
+    if department_id:
+        try:
+            dept_name = Department.objects.get(
+                id=department_id
+            ).name.replace(' ', '_')
+        except Department.DoesNotExist:
+            pass
+
+    response['Content-Disposition'] = f'attachment; filename=approved_volunteers_{dept_name}_{week or "all"}.xlsx'
+    wb.save(response)
+    return response
+
+
+@login_required
+@staff_required
+def staff_students(request):
+    search = request.GET.get('search', '')
+    level_filter = request.GET.get('level', 'all')
+
+    students = StudentProfile.objects.all().order_by('full_name')
+
+    if search:
+        students = students.filter(qid__icontains=search)
+
+    if level_filter != 'all':
+        students = students.filter(academic_level=level_filter)
+
+    student_data = []
+    for student in students:
+        total_applications = student.applications.count()
+        approved_applications = student.applications.filter(
+            status='approved'
+        ).count()
+        total_certificates = student.certificates.count()
+        total_hours = sum(
+            cert.hours for cert in student.certificates.all()
+        )
+        student_data.append({
+            'student': student,
+            'total_applications': total_applications,
+            'approved_applications': approved_applications,
+            'total_certificates': total_certificates,
+            'total_hours': total_hours,
+        })
+
+    return render(request, 'staff/staff_students.html', {
+        'student_data': student_data,
+        'search': search,
+        'level_filter': level_filter,
+        'total_students': students.count(),
+    })
+
+
+@login_required
+@staff_required
+def staff_student_detail(request, student_id):
+    student = get_object_or_404(StudentProfile, id=student_id)
+    applications = student.applications.all().order_by('-submitted_at')
+    certificates = student.certificates.all().order_by('-issued_at')
+    workshop_registrations = student.workshop_registrations.all().order_by('-registered_at')
+    total_hours = sum(cert.hours for cert in certificates)
+
+    return render(request, 'staff/staff_student_detail.html', {
+        'student': student,
+        'applications': applications,
+        'certificates': certificates,
+        'workshop_registrations': workshop_registrations,
+        'total_hours': total_hours,
     })

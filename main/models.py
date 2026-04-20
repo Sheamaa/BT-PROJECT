@@ -106,6 +106,7 @@ class Application(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
     submitted_at = models.DateTimeField(auto_now_add=True)
     duration = models.IntegerField(default=5)
+    approved_department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_applications')
 
     def __str__(self):
         return f"Application by {self.student.full_name} - {self.status}"
