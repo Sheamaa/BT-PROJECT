@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPAP Hospital Volunteering Program</title>
+    <title>HPAP — Hospital Volunteering Program</title>
     <meta name="description" content="Apply and get matched to the best hospital volunteering department for you">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <section class="hero">
         <h1 class="hero-title">HPAP Hospital Volunteering Program</h1>
         <p class="hero-subtitle">Apply and get matched to the best department for you</p>
@@ -41,19 +41,21 @@
         </div>
     </section>
 
-    <!-- Program Section -->
+    <!-- Program -->
     <section class="program-section">
         <div class="program-container">
             <div class="program-card">
                 <div class="program-grid">
                     <div class="program-image">
-                        <img src="{% static 'imgs/hospital-volunteering.jpg' %}" alt=" volunteers">
+                        <img src="{% static 'imgs/hospital-volunteering.jpg' %}"
+                            alt="Hospital volunteers helping patients">
                     </div>
                     <div class="program-content">
                         <h2 class="program-title">Hospital Volunteering</h2>
                         <p class="program-description">
-                            Join our community of dedicated volunteers making a difference in healthcare. Gain valuable
-                            experience while helping patients and staff.
+                            Join our community of dedicated volunteers making a difference
+                            in healthcare. Gain valuable experience while helping patients
+                            and staff across Hamad Medical Corporation.
                         </p>
                         <div class="program-button">
                             <a href="{% url 'auth_page' %}" class="btn btn-accent">Register Now</a>
@@ -64,11 +66,13 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About -->
     <section class="about-section">
         <div class="about-container">
             <p class="about-text">
-                This platform helps students apply and get matched to suitable volunteering departments efficiently.
+                This platform helps students and parents apply and get matched to suitable
+                volunteering departments efficiently. Our smart recommendation system guides
+                you to the best placement based on your interests and availability.
             </p>
         </div>
     </section>
@@ -77,7 +81,7 @@
     <footer class="footer">
         <div class="footer-container">
             <p class="footer-title">HPAP Hospital Volunteering Program</p>
-            <p class="footer-text">© 2026</p>
+            <p class="footer-text">© 2026 Hamad Medical Corporation</p>
             <p class="footer-text">contact@hpap-volunteer.org</p>
         </div>
     </footer>

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Volunteering - Login</title>
+    <title>HPAP — Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -15,7 +15,9 @@
 </head>
 
 <body>
+
     <div class="auth-container">
+
         <div class="auth-header">
             <div class="auth-logo">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -23,9 +25,9 @@
                     <path
                         d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z" />
                 </svg>
-                <h1>Hospital Volunteering</h1>
+                <h1>HPAP</h1>
             </div>
-            <p class="auth-subtitle">Make a difference in your community</p>
+            <p class="auth-subtitle">Hospital Volunteering Program</p>
         </div>
 
         <div class="auth-card">
@@ -43,96 +45,94 @@
                         <input type="email" id="login-email" name="email" class="form-input"
                             placeholder="Enter your email" required>
                     </div>
-
                     <div class="form-group">
                         <label for="login-password" class="form-label">Password</label>
                         <input type="password" id="login-password" name="password" class="form-input"
                             placeholder="Enter your password" required>
                     </div>
-
                     <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
-
                     <button type="submit" class="btn-primary">Login</button>
+                    {% if messages %}
+                    <div class="auth-messages">
+                        {% for message in messages %}
+                        <p class="auth-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                            {{ message }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </form>
-
                 <p class="auth-footer">
-                    Don't have an account? <a href="#" class="switch-tab" data-tab="signup">Sign up</a>
+                    Don't have an account?
+                    <a href="#" class="switch-tab" data-tab="signup">Sign up</a>
                 </p>
             </div>
 
             <!-- Sign Up Form -->
             <div id="signup" class="tab-content">
-    <form action="{% url 'signup' %}" method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="signup-name" class="form-label">Full Name</label>
-            <input type="text" id="signup-name" name="full_name" class="form-input"
-                placeholder="Enter your full name" required>
-        </div>
-        <div class="form-group">
-            <label for="signup-email" class="form-label">Email</label>
-            <input type="email" id="signup-email" name="email" class="form-input"
-                placeholder="Enter your email" required>
-        </div>
-        <div class="form-group">
-            <label for="signup-password" class="form-label">Password</label>
-            <input type="password" id="signup-password" name="password" class="form-input"
-                placeholder="Create a password" required>
-        </div>
-        <div class="form-group">
-            <label for="signup-role" class="form-label">I am signing up as</label>
-            <select id="signup-role" name="role" class="form-select" required>
-                <option value="" disabled selected>Select role</option>
-                <option value="student">Student</option>
-                <option value="parent">Parent</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="signup-level" class="form-label">Academic Level</label>
-            <select id="signup-level" name="academic_level" class="form-select" required>
-                <option value="" disabled selected>Select your academic level</option>
-                <option value="high-school">High School</option>
-                <option value="undergraduate">Undergraduate</option>
-                <option value="graduate">Graduate</option>
-                <option value="postgraduate">Postgraduate</option>
-            </select>
-        </div>
-        <button type="submit" class="btn-primary">Create Account</button>
+                <form action="{% url 'signup' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="signup-name" class="form-label">Full Name</label>
+                        <input type="text" id="signup-name" name="full_name" class="form-input"
+                            placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email" class="form-label">Email</label>
+                        <input type="email" id="signup-email" name="email" class="form-input"
+                            placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password" class="form-label">Password</label>
+                        <input type="password" id="signup-password" name="password" class="form-input"
+                            placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-role" class="form-label">I am signing up as</label>
+                        <select id="signup-role" name="role" class="form-select" required>
+                            <option value="" disabled selected>Select role</option>
+                            <option value="student">Student</option>
+                            <option value="parent">Parent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-level" class="form-label">Academic Level</label>
+                        <select id="signup-level" name="academic_level" class="form-select" required>
+                            <option value="" disabled selected>Select your academic level</option>
+                            <option value="high-school">High School</option>
+                            <option value="undergraduate">Undergraduate</option>
+                            <option value="graduate">Graduate</option>
+                            <option value="postgraduate">Postgraduate</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                    {% if messages %}
+                    <div class="auth-messages">
+                        {% for message in messages %}
+                        <p class="auth-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                            {{ message }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </form>
+                <p class="auth-footer">
+                    Already have an account?
+                    <a href="#" class="switch-tab" data-tab="login">Login</a>
+                </p>
+            </div>
 
-        {% if messages %}
-        <div style="margin-top:1rem">
-            {% for message in messages %}
-            <p style="color:{% if message.tags == 'error' %}#991b1b{% else %}#065f46{% endif %};font-size:0.875rem;text-align:center">
-                {{ message }}
-            </p>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-    </form>
-    <p class="auth-footer">
-        Already have an account? <a href="#" class="switch-tab" data-tab="login">Login</a>
-    </p>
-</div>
         </div>
     </div>
 
     <script>
-        // Tab switching functionality
         document.querySelectorAll('.tab-btn, .switch-tab').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const targetTab = this.dataset.tab;
-
-                // Update tab buttons
                 document.querySelectorAll('.tab-btn').forEach(tab => {
-                    tab.classList.remove('active');
-                    if (tab.dataset.tab === targetTab) {
-                        tab.classList.add('active');
-                    }
+                    tab.classList.toggle('active', tab.dataset.tab === targetTab);
                 });
-
-                // Update tab content
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
                 });
@@ -140,6 +140,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>
