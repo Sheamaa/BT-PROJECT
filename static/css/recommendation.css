@@ -1,3 +1,4 @@
+/* ── CONTAINER ── */
 .rec-container {
     max-width: 720px;
     margin: 0 auto;
@@ -6,42 +7,54 @@
     gap: 2rem;
 }
 
+/* ── HEADER ── */
 .rec-header {
     text-align: center;
 }
 
 .rec-header h1 {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.75rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin-bottom: 0.5rem;
 }
 
 .rec-header p {
     font-size: 0.9375rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
+/* ── CARD ── */
 .rec-card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 2rem;
 }
 
+/* ── QUESTION ── */
 .question-group {
     margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.question-group:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .question-label {
     display: block;
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin-bottom: 1rem;
+    line-height: 1.4;
 }
 
+/* ── OPTIONS ── */
 .options-grid {
     display: flex;
     flex-wrap: wrap;
@@ -53,98 +66,108 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.875rem;
-    color: #1f2937;
+    color: var(--text);
     transition: all 0.2s;
+    user-select: none;
 }
 
 .option-card:hover {
-    border-color: #0078c2;
-    background: #f0f7ff;
+    border-color: var(--primary);
+    background: rgba(0, 120, 194, 0.04);
 }
 
 .option-card input[type="radio"] {
-    accent-color: #0078c2;
+    accent-color: var(--primary);
+    flex-shrink: 0;
 }
 
 .option-card:has(input:checked) {
-    border-color: #0078c2;
-    background: #e6f1fb;
+    border-color: var(--primary);
+    background: rgba(0, 120, 194, 0.08);
     color: #0c447c;
     font-weight: 500;
 }
 
+/* ── SUBMIT BUTTON ── */
 .submit-btn {
     width: 100%;
     padding: 0.875rem;
-    background: #0078c2;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     cursor: pointer;
     transition: background 0.2s;
     margin-top: 1rem;
 }
 
 .submit-btn:hover {
-    background: #006aa8;
+    background: var(--primary-hover);
 }
 
+.submit-btn:active {
+    transform: translateY(1px);
+}
+
+/* ── RESULT CARD ── */
 .result-card {
-    background: white;
-    border: 2px solid #0078c2;
+    background: var(--card);
+    border: 2px solid var(--primary);
     border-radius: 12px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .result-icon svg {
     width: 3rem;
     height: 3rem;
-    color: #0078c2;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
 }
 
 .result-label {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .result-dept {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0078c2;
-    margin-top: 0.25rem;
+    color: var(--primary);
 }
 
 .result-location {
     font-size: 0.875rem;
-    color: #6b7280;
-    margin-top: 0.25rem;
+    color: var(--muted);
 }
 
 .result-supervisor {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .apply-btn {
-    display: inline-block;
-    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
     padding: 0.75rem 2rem;
-    background: #0078c2;
+    background: var(--primary);
     color: white;
     border-radius: 8px;
+    font-family: var(--font-heading);
     font-weight: 600;
     font-size: 0.9375rem;
     text-decoration: none;
@@ -152,5 +175,49 @@
 }
 
 .apply-btn:hover {
-    background: #006aa8;
+    background: var(--primary-hover);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+    .rec-card {
+        padding: 1.25rem;
+    }
+
+    .rec-header h1 {
+        font-size: 1.375rem;
+    }
+
+    .options-grid {
+        gap: 0.5rem;
+    }
+
+    .option-card {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+        width: 100%;
+    }
+
+    .result-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .result-dept {
+        font-size: 1.25rem;
+    }
+
+    .apply-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .rec-container {
+        gap: 1.25rem;
+    }
+
+    .question-group {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
 }

@@ -49,6 +49,8 @@ def login_view(request):
             messages.error(request, 'No account found with this email.')
     return redirect('auth_page')
 
+
+
 def signup_view(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
@@ -92,6 +94,7 @@ def profile_view(request):
         profile.academic_level = request.POST.get('academic_level') or None
         profile.grade_year = request.POST.get('grade_year')
         profile.institution = request.POST.get('institution')
+        profile.profile_picture = request.FILES.get('profile_picture') or None
 
         if request.FILES.get('id_document'):
             profile.id_document = request.FILES['id_document']
@@ -228,6 +231,11 @@ def apply(request):
                 file=file,
                 document_type='additional'
             )
+
+        # Checking of the profile is complete
+        if not profile.phone or not profile.qid or not profile.qid_expiry_date or not profile.academic_level or not profile.grade_year or not profile.institution or not profile.id_document:
+            messages.error(request, 'Please complete your profile before applying.')
+            return redirect('profile')
         
 
         # create notification for student
@@ -239,6 +247,8 @@ def apply(request):
 
         messages.success(request, 'Your application has been submitted successfully!')
         return redirect('dashboard')
+
+        
 
     return render(request, 'apply.html', {
         'profile': profile,
