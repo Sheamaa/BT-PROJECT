@@ -1,3 +1,4 @@
+/* ── CONTAINER ── */
 .workshops-container {
     max-width: 960px;
     margin: 0 auto;
@@ -6,32 +7,35 @@
     gap: 2rem;
 }
 
+/* ── PAGE HEADER ── */
 .page-header {
     text-align: center;
 }
 
 .page-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.75rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
 }
 
 .page-subtitle {
     font-size: 0.9375rem;
-    color: #6b7280;
+    color: var(--muted);
     margin-top: 0.25rem;
 }
 
+/* ── GRID ── */
 .workshops-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
 }
 
+/* ── WORKSHOP CARD ── */
 .workshop-card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
@@ -39,34 +43,48 @@
 }
 
 .workshop-card:hover {
-    border-color: #0078c2;
+    border-color: var(--primary);
     box-shadow: 0 4px 12px rgba(0, 120, 194, 0.1);
     transform: translateY(-2px);
 }
 
+/* ── POSTER ── */
 .workshop-poster img {
     width: 100%;
     height: 180px;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s;
+}
+
+.workshop-card:hover .workshop-poster img {
+    transform: scale(1.02);
 }
 
 .workshop-poster-placeholder {
     width: 100%;
     height: 180px;
-    background: #f0f7ff;
+    background: rgba(0, 120, 194, 0.06);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
 }
 
 .workshop-poster-placeholder svg {
-    width: 3rem;
-    height: 3rem;
-    color: #0078c2;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--primary);
     opacity: 0.4;
 }
 
+.workshop-poster-placeholder p {
+    font-size: 0.8125rem;
+    color: #9ca3af;
+}
+
+/* ── WORKSHOP INFO ── */
 .workshop-info {
     padding: 1.25rem;
     display: flex;
@@ -78,7 +96,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #e6f1fb;
+    background: rgba(0, 120, 194, 0.08);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
     min-width: 48px;
@@ -86,10 +104,10 @@
 }
 
 .date-day {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.25rem;
     font-weight: 700;
-    color: #0078c2;
+    color: var(--primary);
     line-height: 1;
 }
 
@@ -103,24 +121,27 @@
 
 .workshop-details {
     flex: 1;
+    min-width: 0;
 }
 
 .workshop-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.workshop-timing {
+.workshop-timing,
+.workshop-dates {
     font-size: 0.8125rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .workshop-dates {
-    font-size: 0.8125rem;
-    color: #6b7280;
     margin-top: 0.2rem;
 }
 
@@ -129,16 +150,17 @@
     align-items: center;
     gap: 0.375rem;
     font-size: 0.8125rem;
-    color: #6b7280;
+    color: var(--muted);
     margin-top: 0.5rem;
 }
 
 .workshop-capacity svg {
     width: 0.875rem;
     height: 0.875rem;
+    flex-shrink: 0;
 }
 
-/* Modal */
+/* ── MODAL OVERLAY ── */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -154,8 +176,9 @@
     display: flex;
 }
 
+/* ── MODAL CONTENT ── */
 .modal-content {
-    background: white;
+    background: var(--card);
     border-radius: 16px;
     max-width: 520px;
     width: 100%;
@@ -168,8 +191,8 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 8px;
     width: 2rem;
     height: 2rem;
@@ -178,12 +201,17 @@
     justify-content: center;
     cursor: pointer;
     z-index: 10;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--background);
 }
 
 .modal-close svg {
     width: 1rem;
     height: 1rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .modal-poster img {
@@ -194,15 +222,16 @@
     display: block;
 }
 
+/* ── MODAL INFO ── */
 .modal-info {
     padding: 1.5rem;
 }
 
 .modal-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin-bottom: 0.75rem;
 }
 
@@ -231,7 +260,65 @@
 .meta-item svg {
     width: 1rem;
     height: 1rem;
-    color: #0078c2;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+/* ── MODAL ACTIONS ── */
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.register-btn:hover {
+    background: var(--primary-hover);
+}
+
+.register-btn:active {
+    transform: translateY(1px);
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.875rem;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.download-btn:hover {
+    background: rgba(0, 120, 194, 0.06);
+}
+
+.download-btn svg {
+    width: 1rem;
+    height: 1rem;
     flex-shrink: 0;
 }
 
@@ -254,28 +341,11 @@
     flex-shrink: 0;
 }
 
-.register-btn {
-    width: 100%;
-    padding: 0.875rem;
-    background: #0078c2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.register-btn:hover {
-    background: #006aa8;
-}
-
+/* ── EMPTY STATE ── */
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: #6b7280;
+    color: var(--muted);
 }
 
 .empty-state svg {
@@ -283,13 +353,14 @@
     height: 4rem;
     margin: 0 auto 1rem;
     opacity: 0.3;
+    display: block;
 }
 
 .empty-state h3 {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.125rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin-bottom: 0.5rem;
 }
 
@@ -297,61 +368,40 @@
     font-size: 0.9375rem;
 }
 
-.modal-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+    .workshops-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        font-size: 1.375rem;
+    }
+
+    .modal-content {
+        max-height: 95vh;
+        border-radius: 12px;
+    }
+
+    .modal-info {
+        padding: 1.25rem;
+    }
+
+    .modal-title {
+        font-size: 1.125rem;
+    }
 }
 
-.download-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 93.6%;
-    padding: 0.875rem;
-    background: transparent;
-    color: #0078c2;
-    border: 1px solid #0078c2;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
+@media (max-width: 480px) {
+    .workshops-container {
+        gap: 1.25rem;
+    }
 
-    
-}
+    .workshop-info {
+        padding: 1rem;
+    }
 
-.download-btn:hover {
-    background: #e6f1fb;
-}
-
-.download-btn svg {
-    width: 1rem;
-    height: 1rem;
-}
-
-.workshop-poster-placeholder {
-    width: 100%;
-    height: 180px;
-    background: #f0f7ff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.workshop-poster-placeholder svg {
-    width: 2.5rem;
-    height: 2.5rem;
-    color: #0078c2;
-    opacity: 0.4;
-}
-
-.workshop-poster-placeholder p {
-    font-size: 0.8125rem;
-    color: #9ca3af;
+    .modal-overlay {
+        padding: 0.5rem;
+    }
 }

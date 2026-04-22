@@ -156,7 +156,7 @@ class Workshop(models.Model):
     timings = models.CharField(max_length=50)
     description = models.TextField()
     poster = models.ImageField(upload_to='workshop_posters/')
-    picture = models.ImageField(upload_to='workshop_pictures/', null=True, blank=True)
+    picture = models.ImageField(upload_to='workshop_pictures/', null=True, blank=True, default='workshop_pictures/Discover_your_future_in_healthcare.png')
     capacity = models.IntegerField()
 
     def __str__(self):
