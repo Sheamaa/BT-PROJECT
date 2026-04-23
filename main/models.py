@@ -93,9 +93,7 @@ class DepartmentWeeklySlot(models.Model):
 
 class Application(models.Model):
     STATUS_CHOICES = [
-        ('draft', 'Draft'),
         ('submitted', 'Submitted'),
-        ('under_review', 'Under Review'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]

@@ -693,20 +693,44 @@ class NotificationTest(TestCase):
         self.user, self.profile = create_student_user()
         self.client.login(username='student1', password='testpass123')
 
-    def test_notification_created_on_application_submit(self):
-        dept = create_department()
-        slot = create_weekly_slot(dept)
-        next_sunday = slot.week_start_date
-        self.client.post(reverse('apply'), {
-            'first_choice_dept': dept.id,
-            'preferred_week': str(next_sunday),
-        })
-        self.assertTrue(
-            Notification.objects.filter(
-                user=self.user,
-                type='application_submitted'
-            ).exists()
-        )
+def test_notification_created_on_application_submit(self):
+    dept = create_department()
+
+    today = date.today()
+    days_until_sunday = (6 - today.weekday()) % 7
+    if days_until_sunday == 0:
+        days_until_sunday = 7
+    next_sunday = today + timedelta(days=days_until_sunday)
+
+    slot = DepartmentWeeklySlot.objects.create(
+        department=dept,
+        week_start_date=next_sunday,
+        total_slots=5,
+        filled_slots=0
+    )
+
+
+    self.profile.qid = '28734901234'
+    self.profile.phone = '+974 5512 3456'
+    self.profile.save()
+
+    response = self.client.post(reverse('apply'), {
+        'first_choice_dept': str(dept.id),
+        'preferred_week': str(next_sunday),
+    })
+
+    # print response for debugging if needed
+    print(f"Response status: {response.status_code}")
+    print(f"Messages: {[str(m) for m in response.wsgi_request._messages]}")
+
+    self.assertTrue(
+        Notification.objects.filter(
+            user=self.user,
+            type='application_submitted'
+        ).exists()
+    )
+
+      
 
     def test_mark_all_notifications_read(self):
         Notification.objects.create(

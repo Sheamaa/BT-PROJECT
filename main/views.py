@@ -184,7 +184,7 @@ def apply(request):
         # check if student already has an active application
         active_application = Application.objects.filter(
             student=profile,
-            status__in=['submitted', 'under_review', 'approved']
+            status__in=['submitted', 'approved']
         ).first()
 
         if active_application and active_application.preferred_slot == preferred_week:
@@ -381,7 +381,6 @@ def staff_dashboard(request):
 
     total = Application.objects.count()
     pending = Application.objects.filter(status='submitted').count()
-    under_review = Application.objects.filter(status='under_review').count()
     approved = Application.objects.filter(status='approved').count()
     rejected = Application.objects.filter(status='rejected').count()
 
@@ -398,7 +397,6 @@ def staff_dashboard(request):
         'level_filter': level_filter,
         'total': total,
         'pending': pending,
-        'under_review': under_review,
         'approved': approved,
         'rejected': rejected,
         'departments': departments,
