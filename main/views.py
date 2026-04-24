@@ -5,7 +5,7 @@ from .models import User, StudentProfile, Workshop, Department, Recommendation, 
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from .decision_tree import get_recommendation
-from .models import User, StudentProfile, StaffProfile, Workshop, Department, Recommendation, Application, ApplicationDocument, DepartmentWeeklySlot, Notification, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, Certificate
+from .models import User, StudentProfile, StaffProfile, Workshop, Department, Recommendation, Application, ApplicationDocument, DepartmentWeeklySlot, Notification, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, WorkshopAttendanceSheet, Certificate
 from .email_service import (
     send_application_submitted_email,
     send_application_approved_email,
@@ -127,6 +127,22 @@ def dashboard(request):
         'profile': profile,
         'applications': applications,
         'certificates': certificates,
+    })
+
+@login_required
+def activities(request):
+    profile = request.user.student_profile
+
+    hospital_applications = profile.applications.all().order_by('-submitted_at')
+    workshop_registrations = profile.workshop_registrations.all().order_by('-registered_at')
+    certificates = profile.certificates.all().order_by('-issued_at')
+    total_hours = sum(cert.hours for cert in certificates)
+
+    return render(request, 'activities.html', {
+        'hospital_applications': hospital_applications,
+        'workshop_registrations': workshop_registrations,
+        'certificates': certificates,
+        'total_hours': total_hours,
     })
 
 
@@ -666,11 +682,18 @@ def staff_delete_volunteering_document(request, doc_id):
 @staff_required
 def staff_attendance_list(request):
     status_filter = request.GET.get('status', 'all')
-    sheets = AttendanceSheet.objects.all().order_by('-uploaded_at')
+    type_filter = request.GET.get('type', 'all')
+
+    hospital_sheets = AttendanceSheet.objects.all().order_by('-uploaded_at')
+    workshop_sheets = WorkshopAttendanceSheet.objects.all().order_by('-uploaded_at')
+
     if status_filter != 'all':
-        sheets = sheets.filter(status=status_filter)
+        hospital_sheets = hospital_sheets.filter(status=status_filter)
+        workshop_sheets = workshop_sheets.filter(status=status_filter)
+
     return render(request, 'staff/staff_attendance.html', {
-        'sheets': sheets,
+        'hospital_sheets': hospital_sheets,
+        'workshop_sheets': workshop_sheets,
         'status_filter': status_filter,
     })
 
@@ -703,6 +726,38 @@ def staff_verify_attendance(request, sheet_id):
             )
             messages.success(request, 'Attendance sheet rejected.')
     return redirect('staff_attendance_list')
+
+
+
+@login_required
+@staff_required
+def staff_verify_workshop_attendance(request, sheet_id):
+    sheet = get_object_or_404(WorkshopAttendanceSheet, id=sheet_id)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        note = request.POST.get('staff_note', '')
+        if action == 'verify':
+            sheet.status = 'verified'
+            sheet.staff_note = note
+            sheet.save()
+            Notification.objects.create(
+                user=sheet.registration.student.user,
+                message=f'Your attendance sheet for {sheet.registration.workshop.name} has been verified. Your certificate will be issued soon.',
+                type='general'
+            )
+            messages.success(request, 'Workshop attendance verified!')
+        elif action == 'reject':
+            sheet.status = 'rejected'
+            sheet.staff_note = note
+            sheet.save()
+            Notification.objects.create(
+                user=sheet.registration.student.user,
+                message=f'Your attendance sheet for {sheet.registration.workshop.name} was rejected. Reason: {note}',
+                type='general'
+            )
+            messages.success(request, 'Workshop attendance rejected.')
+    return redirect('staff_attendance_list')
+
 
 
 @login_required
@@ -803,6 +858,57 @@ def student_upload_attendance(request, app_id):
         'application': application,
     })
 
+@login_required
+def student_upload_workshop_attendance(request, reg_id):
+    registration = get_object_or_404(
+        WorkshopRegistration,
+        id=reg_id,
+        student=request.user.student_profile
+    )
+
+    if hasattr(registration, 'workshop_attendance'):
+        if registration.workshop_attendance.status != 'rejected':
+            messages.error(
+                request,
+                'You have already uploaded an attendance sheet for this workshop.'
+            )
+            return redirect('activities')
+
+    if request.method == 'POST':
+        file = request.FILES.get('attendance_file')
+        if file:
+            if hasattr(registration, 'workshop_attendance'):
+                registration.workshop_attendance.file = file
+                registration.workshop_attendance.status = 'pending'
+                registration.workshop_attendance.save()
+            else:
+                WorkshopAttendanceSheet.objects.create(
+                    registration=registration,
+                    file=file,
+                )
+
+            staff_users = User.objects.filter(role='staff')
+            for staff in staff_users:
+                Notification.objects.create(
+                    user=staff,
+                    message=f'{request.user.student_profile.full_name} uploaded a workshop attendance sheet for {registration.workshop.name}.',
+                    type='general'
+                )
+
+            Notification.objects.create(
+                user=request.user,
+                message=f'Your attendance sheet for {registration.workshop.name} has been uploaded and is pending verification.',
+                type='general'
+            )
+            messages.success(
+                request,
+                'Attendance sheet uploaded successfully!'
+            )
+            return redirect('activities')
+
+    return render(request, 'student_upload_workshop_attendance.html', {
+        'registration': registration,
+    })
 
 
 @login_required

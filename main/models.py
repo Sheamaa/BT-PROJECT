@@ -198,6 +198,29 @@ class AttendanceSheet(models.Model):
     def __str__(self):
        return f"Attendance - {self.application.student.full_name}"
 
+class WorkshopAttendanceSheet(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    ]
+    registration = models.OneToOneField(
+        WorkshopRegistration,
+        on_delete=models.CASCADE,
+        related_name='workshop_attendance'
+    )
+    file = models.FileField(upload_to='workshop_attendance/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+    staff_note = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Workshop Attendance - {self.registration.student.full_name}"
+
 class Certificate(models.Model):
     ACTIVITY_TYPE_CHOICES = [
         ('workshop', 'Workshop'),

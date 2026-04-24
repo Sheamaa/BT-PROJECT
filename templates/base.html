@@ -48,6 +48,12 @@
                     class="nav-link {% if request.resolver_match.url_name == 'profile' %}nav-link-active{% endif %}">Profile</a>
                 <a href="{% url 'workshops' %}"
                     class="nav-link {% if request.resolver_match.url_name == 'workshops' %}nav-link-active{% endif %}">Workshops</a>
+
+                <a href="{% url 'activities' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'activities' %}nav-link-active{% endif %}">
+                    My Activities
+                </a>
+
                 {% endif %}
             </nav>
         </div>

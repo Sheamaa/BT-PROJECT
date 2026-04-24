@@ -25,8 +25,16 @@
                 <span class="logo-text">HPAP</span>
             </a>
             <div class="nav-links">
+                {% if request.user.is_authenticated %}
+                {% if request.user.role == 'staff' %}
+                <a href="{% url 'staff_dashboard' %}" class="btn btn-primary">Dashboard</a>
+                {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
+                {% endif %}
+                {% else %}
                 <a href="{% url 'auth_page' %}" class="btn btn-ghost">Login</a>
                 <a href="{% url 'auth_page' %}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
             </div>
         </nav>
     </header>
@@ -36,8 +44,12 @@
         <h1 class="hero-title">HPAP Hospital Volunteering Program</h1>
         <p class="hero-subtitle">Apply and get matched to the best department for you</p>
         <div class="hero-buttons">
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+            {% else %}
             <a href="{% url 'auth_page' %}" class="btn btn-primary btn-lg">Get Started</a>
             <a href="{% url 'auth_page' %}" class="btn btn-outline btn-lg">Login</a>
+            {% endif %}
         </div>
     </section>
 
@@ -55,13 +67,121 @@
                         <p class="program-description">
                             Join our community of dedicated volunteers making a difference
                             in healthcare. Gain valuable experience while helping patients
-                            and staff across Hamad Medical Corporation.
+                            and staff across Hamad Medical Corporation departments in Qatar.
                         </p>
                         <div class="program-button">
                             <a href="{% url 'auth_page' %}" class="btn btn-accent">Register Now</a>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Eligibility Section -->
+    <section class="eligibility-section">
+        <div class="eligibility-container">
+            <div class="eligibility-header">
+                <h2 class="eligibility-title">Who Can Apply?</h2>
+                <p class="eligibility-subtitle">The program is open to high school and undergraduate students who meet
+                    the following criteria</p>
+            </div>
+            <div class="eligibility-grid">
+                <div class="eligibility-card">
+                    <div class="eligibility-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <h3>High School Students</h3>
+                    <ul>
+                        <li>15 or above years old</li>
+                        <li>Valid QID</li>
+                        <li>Available in the monring</li>
+                        <li>Available on weekdays</li>
+                    </ul>
+                </div>
+                <div class="eligibility-card">
+                    <div class="eligibility-icon eligibility-icon-green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <h3>Undergraduate Students</h3>
+                    <ul>
+                        <li>1st year or above</li>
+                        <li>Enrolled in a institution</li>
+                        <li>Valid QID</li>
+                        <li>Available in the monring</li>
+                        <li>Available on weekdays</li>
+                    </ul>
+                </div>
+                <div class="eligibility-card">
+                    <div class="eligibility-icon eligibility-icon-purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>Parents</h3>
+                    <ul>
+                        <li>Can apply on behalf of their child</li>
+                        <li>Child must meet eligibility criteria</li>
+                        <li>Valid QID for the child</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-section">
+        <div class="how-container">
+            <h2 class="eligibility-title" style="text-align:center;margin-bottom:0.5rem">How It Works</h2>
+            <p class="eligibility-subtitle" style="text-align:center;margin-bottom:2.5rem">Four simple steps to start
+                your volunteering journey</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Create Account</h3>
+                    <p>Sign up and complete your profile with your personal and academic information</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Get Recommendation</h3>
+                    <p>Answer a short questionnaire and let our smart algorithm suggest the best department for you</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Submit Application</h3>
+                    <p>Apply to your chosen department, select your preferred week, and upload required documents</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Start Volunteering</h3>
+                    <p>Receive approval, complete your volunteering activity, and earn your certificate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Important Notes -->
+    <section class="notes-section">
+        <div class="notes-container">
+            <div class="notes-card">
+                <h3>Important Notes</h3>
+                <ul>
+                    <li>All volunteering activities take place Sunday to Thursday only</li>
+                    <li>Each student may hold only one active hospital volunteering placement at a time</li>
+                    <li>Slots are limited per department per week and allocated on first-come first-served basis</li>
+                    <li>Undergraduate and graduate students may apply for high school departments</li>
+                    <li>High school students may only apply for high school level departments</li>
+                    <li>Students can register for multiple workshops simultaneously</li>
+                </ul>
             </div>
         </div>
     </section>

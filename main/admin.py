@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     User, StudentProfile, StaffProfile, Department,
     DepartmentWeeklySlot, Application, ApplicationDocument,
-    Recommendation, Notification, Workshop, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, Certificate
+    Recommendation, Notification, Workshop, WorkshopRegistration, VolunteeringDocument, AttendanceSheet, WorkshopAttendanceSheet, Certificate
 )
 
 
@@ -63,6 +63,10 @@ class AttendanceSheetAdmin(admin.ModelAdmin):
 @admin.register(VolunteeringDocument)
 class VolunteeringDocumentAdmin(admin.ModelAdmin):
     list_display = ['name', 'uploaded_at']
+
+@admin.register(WorkshopAttendanceSheet)
+class WorkshopAttendanceSheetAdmin(admin.ModelAdmin):
+    list_display = ['registration', 'status', 'uploaded_at']
 
 @admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):

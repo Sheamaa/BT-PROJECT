@@ -2,10 +2,12 @@
 {% load static %}
 {% block title %}Attendance Sheets{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/staff.css' %}">{% endblock %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="staff-container">
+
     <div>
         <h1 class="page-title">Attendance Sheets</h1>
         <p class="page-subtitle">Review and verify student uploaded attendance sheets</p>
@@ -18,8 +20,10 @@
         <a href="?status=rejected" class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
     </div>
 
-    <div class="table-card">
-        {% if sheets %}
+    <!-- Hospital Attendance -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Hospital Volunteering Attendance</h2>
+        {% if hospital_sheets %}
         <table class="applications-table">
             <thead>
                 <tr>
@@ -33,7 +37,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for sheet in sheets %}
+                {% for sheet in hospital_sheets %}
                 <tr>
                     <td>
                         <p class="student-name">{{ sheet.application.student.full_name }}</p>
@@ -59,13 +63,19 @@
                                 style="padding:0.375rem 0.5rem;border:1px solid #e5e7eb;border-radius:6px;font-size:0.8125rem">
                             <div style="display:flex;gap:0.5rem">
                                 <button type="submit" name="action" value="verify" class="approve-btn"
-                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">Verify</button>
+                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">
+                                    Verify
+                                </button>
                                 <button type="submit" name="action" value="reject" class="reject-btn"
-                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">Reject</button>
+                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">
+                                    Reject
+                                </button>
                             </div>
                         </form>
                         {% else %}
-                        <p style="font-size:0.8125rem;color:#6b7280">{{ sheet.staff_note|default:"—" }}</p>
+                        <p style="font-size:0.8125rem;color:#6b7280">
+                            {{ sheet.staff_note|default:"—" }}
+                        </p>
                         {% endif %}
                     </td>
                 </tr>
@@ -74,9 +84,79 @@
         </table>
         {% else %}
         <div class="empty-table">
-            <p>No attendance sheets found.</p>
+            <p>No hospital attendance sheets found.</p>
         </div>
         {% endif %}
     </div>
+
+    <!-- Workshop Attendance -->
+    <div class="detail-card">
+        <h2 class="detail-section-title">Workshop Attendance</h2>
+        {% if workshop_sheets %}
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Workshop</th>
+                    <th>Dates</th>
+                    <th>Uploaded</th>
+                    <th>Status</th>
+                    <th>File</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sheet in workshop_sheets %}
+                <tr>
+                    <td>
+                        <p class="student-name">{{ sheet.registration.student.full_name }}</p>
+                    </td>
+                    <td>{{ sheet.registration.workshop.name }}</td>
+                    <td>{{ sheet.registration.workshop.start_date|date:"M d" }} — {{
+                        sheet.registration.workshop.end_date|date:"M d, Y" }}</td>
+                    <td>{{ sheet.uploaded_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ sheet.status }}">
+                            {{ sheet.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn">View</a>
+                    </td>
+                    <td>
+                        {% if sheet.status == 'pending' %}
+                        <form method="POST" action="{% url 'staff_verify_workshop_attendance' sheet.id %}"
+                            style="display:flex;flex-direction:column;gap:0.5rem">
+                            {% csrf_token %}
+                            <input type="text" name="staff_note" placeholder="Note (optional)"
+                                style="padding:0.375rem 0.5rem;border:1px solid #e5e7eb;border-radius:6px;font-size:0.8125rem">
+                            <div style="display:flex;gap:0.5rem">
+                                <button type="submit" name="action" value="verify" class="approve-btn"
+                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">
+                                    Verify
+                                </button>
+                                <button type="submit" name="action" value="reject" class="reject-btn"
+                                    style="padding:0.375rem 0.75rem;font-size:0.8125rem">
+                                    Reject
+                                </button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <p style="font-size:0.8125rem;color:#6b7280">
+                            {{ sheet.staff_note|default:"—" }}
+                        </p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-table">
+            <p>No workshop attendance sheets found.</p>
+        </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

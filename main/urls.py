@@ -17,6 +17,8 @@ urlpatterns = [
     path('workshops/', views.workshops, name='workshops'),
     path('workshops/register/<int:workshop_id>/', views.register_workshop, name='register_workshop'),
     path('student/upload-attendance/<int:app_id>/', views.student_upload_attendance, name='student_upload_attendance'),
+    path('activities/', views.activities, name='activities'),
+    path('workshops/upload-attendance/<int:reg_id>/', views.student_upload_workshop_attendance, name='student_upload_workshop_attendance'),
     # Staff URLs
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
     path('staff/application/<int:app_id>/', views.staff_application_detail, name='staff_application_detail'),
