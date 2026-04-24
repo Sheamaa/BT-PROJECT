@@ -320,6 +320,21 @@
     opacity: 0.8;
 }
 
+.upload-attendance-btn {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.upload-attendance-btn:hover {
+    opacity: 0.8;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
     .programs-grid {

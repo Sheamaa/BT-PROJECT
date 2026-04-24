@@ -39,7 +39,7 @@
                         <p class="student-name">{{ sheet.application.student.full_name }}</p>
                         <p class="student-level">{{ sheet.application.student.academic_level }}</p>
                     </td>
-                    <td>{{ sheet.application.first_choice_dept.name }}</td>
+                    <td>{{ sheet.application.approved_department.name }}</td>
                     <td>{{ sheet.application.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
                     <td>{{ sheet.uploaded_at|date:"M d, Y" }}</td>
                     <td>

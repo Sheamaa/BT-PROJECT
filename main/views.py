@@ -808,157 +808,200 @@ def student_upload_attendance(request, app_id):
 @login_required
 @staff_required
 def export_approved_excel(request):
-    department_id = request.GET.get('department')
-    week = request.GET.get('week')
+    department_id = request.GET.get('department', '').strip()
+    week = request.GET.get('week', '').strip()
 
-    applications = Application.objects.filter(
-        status='approved'
-    ).order_by('student__full_name')
+    try:
+        applications = Application.objects.filter(
+            status='approved'
+        ).select_related(
+            'student', 'student__user',
+            'approved_department',
+            'first_choice_dept',
+            'preferred_slot'
+        ).order_by('student__full_name')
 
-    if department_id:
-        applications = applications.filter(
-            approved_department_id=department_id
-        )
+        if department_id and department_id != 'all':
+            applications = applications.filter(
+                approved_department_id=department_id
+            )
 
-    if week:
-        try:
-            from datetime import datetime, date
-            # handle both formats just in case
+        if week and week not in ['all', '']:
+            week_date = None
             for fmt in ['%Y-%m-%d', '%B %d, %Y', '%b %d, %Y']:
                 try:
-                    week_date = datetime.strptime(week.strip(), fmt).date()
-                    applications = applications.filter(
-                        preferred_slot__week_start_date=week_date
-                    )
+                    week_date = datetime.strptime(week, fmt).date()
                     break
                 except ValueError:
                     continue
-        except Exception:
-            pass
+            if week_date:
+                applications = applications.filter(
+                    preferred_slot__week_start_date=week_date
+                )
 
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = 'Approved Volunteers'
+        applications = list(applications)
 
-    header_font = Font(bold=True, color='FFFFFF', size=12)
-    header_fill = PatternFill(
-        start_color='0078C2',
-        end_color='0078C2',
-        fill_type='solid'
-    )
-    header_alignment = Alignment(horizontal='center', vertical='center')
-    thin_border = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
-    )
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Approved Volunteers'
 
-    ws.merge_cells('A1:H1')
-    title_cell = ws['A1']
-    title_cell.value = 'HPAP Volunteering Program — Approved Volunteers List'
-    title_cell.font = Font(bold=True, size=14, color='0078C2')
-    title_cell.alignment = Alignment(horizontal='center', vertical='center')
-    ws.row_dimensions[1].height = 30
+        header_font = Font(bold=True, color='FFFFFF', size=11)
+        header_fill = PatternFill(
+            start_color='0078C2',
+            end_color='0078C2',
+            fill_type='solid'
+        )
+        header_alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+        thin_border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        alt_fill = PatternFill(
+            start_color='E6F1FB',
+            end_color='E6F1FB',
+            fill_type='solid'
+        )
 
-    if department_id:
-        try:
-            dept = Department.objects.get(id=department_id)
-            ws.merge_cells('A2:H2')
-            dept_cell = ws['A2']
-            dept_cell.value = f'Department: {dept.name} — {dept.location}'
-            dept_cell.font = Font(bold=True, size=11)
-            dept_cell.alignment = Alignment(horizontal='center')
-        except Department.DoesNotExist:
-            pass
+        ws.merge_cells('A1:I1')
+        title_cell = ws['A1']
+        title_cell.value = 'HPAP Volunteering Program — Approved Volunteers List'
+        title_cell.font = Font(bold=True, size=13, color='0078C2')
+        title_cell.alignment = Alignment(
+            horizontal='center', vertical='center'
+        )
+        ws.row_dimensions[1].height = 28
 
-    if week:
-        ws.merge_cells('A3:H3')
-        week_cell = ws['A3']
-        week_cell.value = f'Week Starting: {week}'
-        week_cell.font = Font(size=11)
-        week_cell.alignment = Alignment(horizontal='center')
+        row_offset = 2
 
-    headers = [
-        'No.',
-        'Full Name',
-        'QID Number',
-        'Academic Level',
-        'Institution',
-        'Phone',
-        'Email',
-        'Department',
-        'Week Start Date',
-    ]
+        if department_id and department_id not in ['all', '']:
+            try:
+                dept_obj = Department.objects.get(id=department_id)
+                ws.merge_cells(f'A{row_offset}:I{row_offset}')
+                cell = ws[f'A{row_offset}']
+                cell.value = f'Department: {dept_obj.name} — {dept_obj.location}'
+                cell.font = Font(bold=True, size=11)
+                cell.alignment = Alignment(horizontal='center')
+                row_offset += 1
+            except Department.DoesNotExist:
+                pass
 
-    header_row = 5
-    for col, header in enumerate(headers, 1):
-        cell = ws.cell(row=header_row, column=col, value=header)
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = header_alignment
-        cell.border = thin_border
+        if week and week not in ['all', '']:
+            ws.merge_cells(f'A{row_offset}:I{row_offset}')
+            cell = ws[f'A{row_offset}']
+            cell.value = f'Week Starting: {week}'
+            cell.font = Font(size=10)
+            cell.alignment = Alignment(horizontal='center')
+            row_offset += 1
 
-    ws.row_dimensions[header_row].height = 20
+        row_offset += 1
 
-    alt_fill = PatternFill(
-        start_color='E6F1FB',
-        end_color='E6F1FB',
-        fill_type='solid'
-    )
-
-    for row_num, app in enumerate(applications, 1):
-        row = header_row + row_num
-        data = [
-            row_num,
-            app.student.full_name,
-            app.student.qid,
-            app.student.academic_level,
-            app.student.institution,
-            app.student.phone,
-            app.student.user.email,
-            app.approved_department.name if app.approved_department else app.first_choice_dept.name,
-            str(app.preferred_slot.week_start_date) if app.preferred_slot else '—',
+        headers = [
+            'No.',
+            'Full Name',
+            'Email',
+            'QID Number',
+            'Phone',
+            'Academic Level',
+            'Institution',
+            'Department',
+            'Week Start Date',
         ]
-        for col, value in enumerate(data, 1):
-            cell = ws.cell(row=row, column=col, value=value)
+
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(
+                row=row_offset, column=col, value=header
+            )
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
             cell.border = thin_border
-            cell.alignment = Alignment(vertical='center')
-            if row_num % 2 == 0:
-                cell.fill = alt_fill
 
-        ws.row_dimensions[row].height = 18
+        ws.row_dimensions[row_offset].height = 20
 
-    column_widths = [6, 30, 20, 20, 18, 20, 30, 30, 20]
-    for col, width in enumerate(column_widths, 1):
-        ws.column_dimensions[
-            openpyxl.utils.get_column_letter(col)
-        ].width = width
+        for row_num, app in enumerate(applications, 1):
+            row = row_offset + row_num
+            try:
+                dept_name = (
+                    app.approved_department.name
+                    if app.approved_department
+                    else app.first_choice_dept.name
+                    if app.first_choice_dept
+                    else '—'
+                )
+                week_val = (
+                    str(app.preferred_slot.week_start_date)
+                    if app.preferred_slot
+                    else '—'
+                )
+                data = [
+                    row_num,
+                    app.student.full_name or '—',
+                    app.student.user.email or '—',
+                    app.student.qid or '—',
+                    app.student.phone or '—',
+                    app.student.academic_level or '—',
+                    app.student.institution or '—',
+                    dept_name,
+                    week_val,
+                ]
+            except Exception:
+                continue
 
-    total_row = header_row + len(applications) + 2
-    ws.cell(
-        row=total_row,
-        column=1,
-        value=f'Total: {len(applications)} volunteers'
-    ).font = Font(bold=True)
+            for col, value in enumerate(data, 1):
+                cell = ws.cell(row=row, column=col, value=value)
+                cell.border = thin_border
+                cell.alignment = Alignment(vertical='center')
+                if row_num % 2 == 0:
+                    cell.fill = alt_fill
 
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
+            ws.row_dimensions[row].height = 18
 
-    dept_name = 'all'
-    if department_id:
-        try:
-            dept_name = Department.objects.get(
-                id=department_id
-            ).name.replace(' ', '_')
-        except Department.DoesNotExist:
-            pass
+        total_row = row_offset + len(applications) + 2
+        total_cell = ws.cell(
+            row=total_row,
+            column=1,
+            value=f'Total: {len(applications)} volunteer(s)'
+        )
+        total_cell.font = Font(bold=True)
 
-    response['Content-Disposition'] = f'attachment; filename=approved_volunteers_{dept_name}_{week or "all"}.xlsx'
-    wb.save(response)
-    return response
+        column_widths = [6, 28, 28, 18, 16, 18, 28, 28, 18]
+        for col, width in enumerate(column_widths, 1):
+            ws.column_dimensions[
+                openpyxl.utils.get_column_letter(col)
+            ].width = width
 
+        response = HttpResponse(
+            content_type=(
+                'application/vnd.openxmlformats-'
+                'officedocument.spreadsheetml.sheet'
+            )
+        )
+
+        dept_name_clean = 'all'
+        if department_id and department_id not in ['all', '']:
+            try:
+                dept_name_clean = Department.objects.get(
+                    id=department_id
+                ).name.replace(' ', '_')
+            except Department.DoesNotExist:
+                pass
+
+        week_clean = week.replace(' ', '_') if week else 'all'
+        filename = f'approved_volunteers_{dept_name_clean}_{week_clean}.xlsx'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        wb.save(response)
+        return response
+
+    except Exception as e:
+        from django.contrib import messages
+        messages.error(request, f'Export failed: {str(e)}')
+        return redirect('staff_dashboard')
 
 @login_required
 @staff_required

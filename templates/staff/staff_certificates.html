@@ -20,6 +20,7 @@
                     <th>Student</th>
                     <th>Department</th>
                     <th>Week</th>
+                    <th>Attendance Sheet</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -31,6 +32,9 @@
                     </td>
                     <td>{{ sheet.application.first_choice_dept.name }}</td>
                     <td>{{ sheet.application.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
+                    <td>
+                        <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn">View</a>
+                    </td>
                     <td>
                         <a href="{% url 'staff_upload_certificate' sheet.application.id %}" class="view-btn">Upload
                             Certificate</a>

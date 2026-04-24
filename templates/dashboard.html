@@ -186,17 +186,17 @@
         {% if app.status == 'approved' %}
         {% if not app.attendance_sheet %}
         <div class="upload-attendance-banner">
-            <p>You have an approved application for <strong>{{ app.first_choice_dept.name }}</strong>. Upload your
+            <p>You have an approved application for <strong>{{ app.approved_department.name }}</strong>. Upload your
                 attendance sheet after completing your activity.</p>
-            <a href="{% url 'student_upload_attendance' app.id %}" class="view-btn">Upload Attendance Sheet</a>
+            <a href="{% url 'student_upload_attendance' app.id %}" class="view-btn upload-attendance-btn">Upload Attendance Sheet</a>
         </div>
         {% elif app.attendance_sheet.status == 'pending' %}
         <div class="upload-attendance-banner" style="background:#faeeda;border-color:#ba7517">
-            <p>Your attendance sheet for <strong>{{ app.first_choice_dept.name }}</strong> is pending verification.</p>
+            <p>Your attendance sheet for <strong>{{ app.approved_department.name }}</strong> is pending verification.</p>
         </div>
         {% elif app.attendance_sheet.status == 'verified' %}
         <div class="upload-attendance-banner" style="background:#eaf3de;border-color:#3b6d11">
-            <p>Your attendance sheet for <strong>{{ app.first_choice_dept.name }}</strong> has been verified. Your
+            <p>Your attendance sheet for <strong>{{ app.approved_department.name }}</strong> has been verified. Your
                 certificate will be issued soon.</p>
         </div>
         {% endif %}
