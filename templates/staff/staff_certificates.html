@@ -2,38 +2,52 @@
 {% load static %}
 {% block title %}Certificates{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/staff.css' %}">{% endblock %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="staff-container">
+
     <div>
         <h1 class="page-title">Certificates</h1>
-        <p class="page-subtitle">Upload certificates for students with verified attendance</p>
+        <p class="page-subtitle">Upload and manage student certificates</p>
     </div>
 
-    {% if pending_verification %}
+    <!-- Pending Hospital Certificates -->
+    {% if pending_hospital %}
     <div class="detail-card">
-        <h2 class="detail-section-title">Pending Certificate Upload</h2>
+        <h2 class="detail-section-title">
+            Pending Hospital Certificates
+            <span style="font-size:0.8125rem;font-weight:400;color:#6b7280;margin-left:0.5rem">
+                {{ pending_hospital.count }} waiting
+            </span>
+        </h2>
         <table class="applications-table">
             <thead>
                 <tr>
                     <th>Student</th>
                     <th>Department</th>
                     <th>Week</th>
-                    <th>Attendance Sheet</th>
+                    <th>Attendance</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for sheet in pending_verification %}
+                {% for sheet in pending_hospital %}
                 <tr>
                     <td>
-                        <p class="student-name">{{ sheet.application.student.full_name }}</p>
+                        <p class="student-name">
+                            {{ sheet.application.student.full_name }}
+                        </p>
                     </td>
                     <td>{{ sheet.application.first_choice_dept.name }}</td>
-                    <td>{{ sheet.application.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}</td>
                     <td>
-                        <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn">View</a>
+                        {{ sheet.application.preferred_slot.week_start_date|date:"M d, Y"|default:"—" }}
+                    </td>
+                    <td>
+                        <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn">
+                            View Sheet
+                        </a>
                     </td>
                     <td>
                         <a href="{% url 'staff_upload_certificate' sheet.application.id %}" class="view-btn">Upload
@@ -46,6 +60,63 @@
     </div>
     {% endif %}
 
+    <!-- Pending Workshop Certificates -->
+    {% if pending_workshop %}
+    <div class="detail-card">
+        <h2 class="detail-section-title">
+            Pending Workshop Certificates
+            <span style="font-size:0.8125rem;font-weight:400;color:#6b7280;margin-left:0.5rem">
+                {{ pending_workshop.count }} waiting
+            </span>
+        </h2>
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Workshop</th>
+                    <th>Dates</th>
+                    <th>Attendance</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sheet in pending_workshop %}
+                <tr>
+                    <td>
+                        <p class="student-name">
+                            {{ sheet.registration.student.full_name }}
+                        </p>
+                    </td>
+                    <td>{{ sheet.registration.workshop.name }}</td>
+                    <td>
+                        {{ sheet.registration.workshop.start_date|date:"M d" }} —
+                        {{ sheet.registration.workshop.end_date|date:"M d, Y" }}
+                    </td>
+                    <td>
+                        <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn">
+                            View Sheet
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_upload_workshop_cert_from_attendance' sheet.id %}"
+                            class="view-btn">Upload Certificate</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if not pending_hospital and not pending_workshop %}
+    <div class="detail-card">
+        <div class="empty-table">
+            <p>No pending certificates at the moment.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Issued Certificates -->
     <div class="detail-card">
         <h2 class="detail-section-title">Issued Certificates</h2>
         {% if issued_certificates %}
@@ -58,7 +129,7 @@
                     <th>Start Date</th>
                     <th>Hours</th>
                     <th>Issued</th>
-                    <th>File</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,7 +148,17 @@
                     <td>{{ cert.start_date|date:"M d, Y" }}</td>
                     <td>{{ cert.hours }} hrs</td>
                     <td>{{ cert.issued_at|date:"M d, Y" }}</td>
-                    <td><a href="{{ cert.certificate_file.url }}" target="_blank" class="doc-view-btn">View</a></td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="{{ cert.certificate_file.url }}" target="_blank" class="doc-view-btn">View</a>
+                            <a href="{% url 'staff_edit_certificate' cert.id %}" class="view-btn">Edit</a>
+                            <form method="POST" action="{% url 'staff_delete_certificate' cert.id %}"
+                                onsubmit="return confirm('Delete this certificate? This cannot be undone.')">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -88,5 +169,6 @@
         </div>
         {% endif %}
     </div>
+
 </div>
 {% endblock %}

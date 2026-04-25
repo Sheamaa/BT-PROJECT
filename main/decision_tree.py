@@ -237,43 +237,51 @@ def traverse_tree(node, answers):
     return node
 
 
+
 def get_recommendation(answers, academic_level, student_area):
-    # Step 1 — determine which areas are available
+
     willing_to_travel = answers.get('willing_to_travel')
     if willing_to_travel == 'yes':
         available_areas = ['doha', 'alwakra', 'alkhor', 'dukhan']
     else:
-        available_areas = [student_area]
+        available_areas = [student_area] if student_area else ['doha']
 
-    # Step 2 — determine eligibility based on academic level
-    if academic_level == 'high-school':
+    # normalize academic level — handle all possible stored values
+    level = academic_level.lower().strip() if academic_level else ''
+    if level in ['high-school', 'high school', 'highschool']:
         eligible = ['highschool']
     else:
         eligible = ['highschool', 'undergraduate']
 
-    # Step 3 — get all departments this student can apply to
     available_depts = Department.objects.filter(
         area__in=available_areas,
         eligibility__in=eligible,
         is_active=True
     )
 
-    # Step 4 — build the tree
-    root = build_tree()
+    # debug — print what is available
+    print(f"DEBUG: academic_level='{academic_level}' → eligible={eligible}")
+    print(f"DEBUG: area filter={available_areas}")
+    print(f"DEBUG: available depts count={available_depts.count()}")
+    for d in available_depts:
+        print(f"  - {d.name} ({d.eligibility}, {d.area})")
 
-    # Step 5 — traverse the tree with the student's answers
-    # this returns a LeafNode containing a list of department names
+    if not available_depts.exists():
+        print("DEBUG: No departments found at all!")
+        return None
+
+    root = build_tree()
     leaf = traverse_tree(root, answers)
 
-    # Step 6 — find the best matching department from the leaf's list
-    # we go through the leaf's department_names in order and return
-    # the first one that exists in the student's available pool
+    print(f"DEBUG: leaf departments = {leaf.department_names}")
+
     for dept_name in leaf.department_names:
         dept = available_depts.filter(
-            name__icontains=dept_name
+            name__icontains=dept_name.split()[0]
         ).first()
         if dept:
+            print(f"DEBUG: matched → {dept.name}")
             return dept
 
-    # Step 7 — fallback: if nothing matched return any available dept
+    print("DEBUG: no match found, returning fallback")
     return available_depts.first()

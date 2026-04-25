@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Upload Workshop Certificate{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-container">
+
+    <div class="back-link">
+        <a href="{% url 'staff_certificates_list' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12,19 5,12 12,5"></polyline>
+            </svg>
+            Back to Certificates
+        </a>
+    </div>
+
+    <div>
+        <h1 class="page-title">Upload Workshop Certificate</h1>
+        <p class="page-subtitle">
+            {{ registration.student.full_name }} —
+            {{ registration.workshop.name }}
+        </p>
+    </div>
+
+    <div class="detail-card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-grid">
+
+                <div class="form-group full">
+                    <label>Workshop Name</label>
+                    <input type="text" name="department_name" value="{{ registration.workshop.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ registration.workshop.start_date|date:'Y-m-d' }}"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>Total Hours</label>
+                    <input type="number" name="hours" required placeholder="e.g. 8">
+                </div>
+
+                <div class="form-group full">
+                    <label>Certificate File</label>
+                    <input type="file" name="certificate_file" required accept=".pdf,image/*">
+                    <p class="field-hint">
+                        Upload the signed certificate as PDF or image
+                    </p>
+                </div>
+
+                <div class="form-group full">
+                    <label>Attendance Sheet</label>
+                    <a href="{{ sheet.file.url }}" target="_blank" class="doc-view-btn" style="width:fit-content">
+                        View Submitted Attendance Sheet
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="approve-btn">
+                    Upload Certificate
+                </button>
+                <a href="{% url 'staff_certificates_list' %}" class="cancel-btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

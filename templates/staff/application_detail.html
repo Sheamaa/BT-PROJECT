@@ -68,34 +68,33 @@
         <div class="detail-grid">
             <div class="detail-item">
                 <p class="detail-label">First Choice Department</p>
-                <p class="detail-value">{{ application.first_choice_dept.name }}</p>
+                <p class="detail-value">
+                    {{ application.first_choice_dept.name }} - (
+                    {% if application.preferred_slot %}
+                    {{ application.preferred_slot.filled_slots }} / {{ application.preferred_slot.department.total_slots }} slots filled
+                    {% else %}
+                    —
+                    {% endif %})
+                </p>
             </div>
             <div class="detail-item">
                 <p class="detail-label">Second Choice Department</p>
-                <p class="detail-value">{{ application.second_choice_dept.name|default:"Not specified" }}</p>
+                <p class="detail-value">
+                    {{ application.second_choice_dept.name|default:"Not specified" }}
+                    - (
+                    {% if application.second_choice_dept.weekly_slots.all %}
+                    {{ application.second_choice_dept.weekly_slots.all.first.filled_slots }} / {{ application.second_choice_dept.weekly_slots.all.first.department.total_slots }} slots filled
+                    {% else %}
+                    —
+                    {% endif %})
+                </p>
             </div>
             <div class="detail-item">
                 <p class="detail-label">Preferred Week</p>
                 <p class="detail-value">{{ application.preferred_slot.week_start_date|date:"M d, Y"|default:"Not specified" }}</p>
             </div>
-            <div class="detail-item">
-                <p class="detail-label">Department Supervisor</p>
-                <p class="detail-value">{{ application.first_choice_dept.supervisor }}</p>
-            </div>
-            <div class="detail-item">
-                <p class="detail-label">Department Location</p>
-                <p class="detail-value">{{ application.first_choice_dept.location }}</p>
-            </div>
-            <div class="detail-item">
-                <p class="detail-label">Weekly Slot Availability</p>
-                <p class="detail-value">
-                    {% if application.preferred_slot %}
-                    {{ application.preferred_slot.filled_slots }} / {{ application.preferred_slot.total_slots }} filled
-                    {% else %}
-                    —
-                    {% endif %}
-                </p>
-            </div>
+           
+           
         </div>
     </div>
 
@@ -150,9 +149,9 @@
                 <p class="slot-title">First choice — {{ application.first_choice_dept.name }}</p>
                 {% if application.preferred_slot %}
                 {% if application.preferred_slot.is_full %}
-                <p class="slot-status slot-full">Full — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.total_slots }} slots filled</p>
+                <p class="slot-status slot-full">Full — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.department.total_slots }} slots filled</p>
                 {% else %}
-                <p class="slot-status slot-available">Available — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.total_slots }} slots filled</p>
+                <p class="slot-status slot-available">Available — {{ application.preferred_slot.filled_slots }}/{{application.preferred_slot.department.total_slots }} slots filled</p>
                 {% endif %}
                 {% else %}
                 <p class="slot-status slot-available">No slot record yet</p>
@@ -166,9 +165,9 @@
                 {% for slot in second_slot %}
                 {% if slot.week_start_date == application.preferred_slot.week_start_date %}
                 {% if slot.is_full %}
-                <p class="slot-status slot-full">Full — {{ slot.filled_slots }}/{{ slot.total_slots }} slots filled</p>
+                <p class="slot-status slot-full">Full — {{ slot.filled_slots }}/{{ slot.department.total_slots }} slots filled</p>
                 {% else %}
-                <p class="slot-status slot-available">Available — {{ slot.filled_slots }}/{{ slot.total_slots }} slots
+                <p class="slot-status slot-available">Available — {{ slot.filled_slots }}/{{ slot.department.total_slots }} slots
                     filled</p>
                 {% endif %}
                 {% endif %}

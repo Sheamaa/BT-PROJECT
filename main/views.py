@@ -30,6 +30,8 @@ def landing_page(request):
     
 def auth_page(request):
     if request.user.is_authenticated:
+        if request.user.role == 'staff':
+            return redirect('staff_dashboard')
         return redirect('dashboard')
     return render(request, 'auth.html')
 
@@ -42,6 +44,8 @@ def login_view(request):
             user = authenticate(request, username=user_obj.username, password=password)
             if user is not None:
                 login(request, user)
+                if user_obj.role == 'staff':
+                    return redirect('staff_dashboard')
                 return redirect('dashboard')
             else:
                 messages.error(request, 'Invalid password.')
@@ -213,7 +217,6 @@ def apply(request):
             department=first_dept,
             week_start_date=week_date,
             defaults={
-                'total_slots': 5,
                 'filled_slots': 0
             }
         )
@@ -231,6 +234,7 @@ def apply(request):
             preferred_slot=slot,
             status='submitted'
         )
+
 
         staff_users = User.objects.filter(role='staff')
         for staff in staff_users:
@@ -442,7 +446,7 @@ def approve_application(request, app_id):
                 slot, created = DepartmentWeeklySlot.objects.get_or_create(
                     department=approved_dept,
                     week_start_date=week_date,
-                    defaults={'total_slots': 5, 'filled_slots': 0}
+                    defaults={'filled_slots': 0}
                 )
                 if slot.is_full():
                     messages.error(request, f'{approved_dept.name} is also full for this week.')
@@ -592,6 +596,7 @@ def staff_department_add(request):
             supervisor=request.POST.get('supervisor'),
             timings=request.POST.get('timings'),
             eligibility=request.POST.get('eligibility'),
+            total_slots=request.POST.get('total_slots', 5),
             has_evening_shift=request.POST.get('has_evening_shift') == 'on',
             is_active=request.POST.get('is_active') == 'on',
         )
@@ -613,6 +618,7 @@ def staff_department_edit(request, dept_id):
         department.supervisor = request.POST.get('supervisor')
         department.timings = request.POST.get('timings')
         department.eligibility = request.POST.get('eligibility')
+        department.total_slots=request.POST.get('total_slots', 5)
         department.has_evening_shift = request.POST.get('has_evening_shift') == 'on'
         department.is_active = request.POST.get('is_active') == 'on'
         department.save()
@@ -763,12 +769,23 @@ def staff_verify_workshop_attendance(request, sheet_id):
 @login_required
 @staff_required
 def staff_certificates_list(request):
-    pending_verification = AttendanceSheet.objects.filter(status='verified').exclude(
+    pending_hospital = AttendanceSheet.objects.filter(
+        status='verified'
+    ).exclude(
         application__certificate__isnull=False
-    )
+    ).order_by('-uploaded_at')
+
+    pending_workshop = WorkshopAttendanceSheet.objects.filter(
+        status='verified'
+    ).exclude(
+        registration__certificate__isnull=False
+    ).order_by('-uploaded_at')
+
     issued_certificates = Certificate.objects.all().order_by('-issued_at')
+
     return render(request, 'staff/staff_certificates.html', {
-        'pending_verification': pending_verification,
+        'pending_hospital': pending_hospital,
+        'pending_workshop': pending_workshop,
         'issued_certificates': issued_certificates,
     })
 
@@ -798,6 +815,47 @@ def staff_upload_certificate(request, app_id):
         'application': application,
         'type': 'hospital',
     })
+
+
+@login_required
+@staff_required
+def staff_edit_certificate(request, cert_id):
+    certificate = get_object_or_404(Certificate, id=cert_id)
+    if request.method == 'POST':
+        certificate.department_name = request.POST.get('department_name')
+        certificate.start_date = request.POST.get('start_date')
+        certificate.hours = request.POST.get('hours')
+        if request.FILES.get('certificate_file'):
+            certificate.certificate_file = request.FILES.get('certificate_file')
+        certificate.save()
+
+        Notification.objects.create(
+            user=certificate.student.user,
+            message=f'Your certificate for {certificate.department_name} has been updated.',
+            type='general'
+        )
+        messages.success(request, 'Certificate updated successfully!')
+        return redirect('staff_certificates_list')
+
+    return render(request, 'staff/staff_certificate_edit.html', {
+        'certificate': certificate,
+    })
+
+
+@login_required
+@staff_required
+def staff_delete_certificate(request, cert_id):
+    if request.method == 'POST':
+        certificate = get_object_or_404(Certificate, id=cert_id)
+        student_name = certificate.student.full_name
+        dept_name = certificate.department_name
+        certificate.delete()
+        messages.success(
+            request,
+            f'Certificate for {student_name} — {dept_name} deleted successfully.'
+        )
+    return redirect('staff_certificates_list')
+
 
 
 @login_required
@@ -907,6 +965,38 @@ def student_upload_workshop_attendance(request, reg_id):
             return redirect('activities')
 
     return render(request, 'student_upload_workshop_attendance.html', {
+        'registration': registration,
+    })
+
+
+
+
+@login_required
+@staff_required
+def staff_upload_workshop_cert_from_attendance(request, sheet_id):
+    sheet = get_object_or_404(WorkshopAttendanceSheet, id=sheet_id)
+    registration = sheet.registration
+
+    if request.method == 'POST':
+        Certificate.objects.create(
+            activity_type='workshop',
+            student=registration.student,
+            workshop_registration=registration,
+            department_name=request.POST.get('department_name'),
+            start_date=request.POST.get('start_date'),
+            hours=request.POST.get('hours'),
+            certificate_file=request.FILES.get('certificate_file'),
+        )
+        Notification.objects.create(
+            user=registration.student.user,
+            message=f'Your certificate for {registration.workshop.name} has been issued. You can download it from your activities page.',
+            type='general'
+        )
+        messages.success(request, 'Workshop certificate uploaded successfully!')
+        return redirect('staff_certificates_list')
+
+    return render(request, 'staff/staff_workshop_cert_form.html', {
+        'sheet': sheet,
         'registration': registration,
     })
 

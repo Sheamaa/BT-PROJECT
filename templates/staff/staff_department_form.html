@@ -75,6 +75,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Weekly Slots Capacity</label>
+                    <input type="number" name="total_slots" value="{{ department.total_slots|default:5 }}" required min="1"
+                        placeholder="e.g. 5">
+                    <p class="field-hint">Maximum volunteers per week for this department</p>
+                </div>
+
+                <div class="form-group">
                     <label class="checkbox-label">
                         <input type="checkbox" name="has_evening_shift" {% if department.has_evening_shift %}checked{%endif %}>
                         Has Evening Shift

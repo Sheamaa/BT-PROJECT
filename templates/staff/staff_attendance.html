@@ -112,8 +112,7 @@
                         <p class="student-name">{{ sheet.registration.student.full_name }}</p>
                     </td>
                     <td>{{ sheet.registration.workshop.name }}</td>
-                    <td>{{ sheet.registration.workshop.start_date|date:"M d" }} — {{
-                        sheet.registration.workshop.end_date|date:"M d, Y" }}</td>
+                    <td>{{ sheet.registration.workshop.start_date|date:"M d" }} — {{sheet.registration.workshop.end_date|date:"M d, Y" }}</td>
                     <td>{{ sheet.uploaded_at|date:"M d, Y" }}</td>
                     <td>
                         <span class="status-badge status-{{ sheet.status }}">

@@ -69,6 +69,7 @@ class Department(models.Model):
     has_evening_shift = models.BooleanField(default=False)
     name = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
+    total_slots = models.IntegerField(default=5, null=True, blank=True)
     timings = models.CharField(max_length=50)
     supervisor = models.CharField(max_length=150)
     eligibility = models.CharField(max_length=20, choices=ELIGIBILITY_CHOICES, default='undergraduate')
@@ -81,11 +82,11 @@ class Department(models.Model):
 class DepartmentWeeklySlot(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='weekly_slots')
     week_start_date = models.DateField()
-    total_slots = models.IntegerField()
+    # total_slots = models.IntegerField(default=0)
     filled_slots = models.IntegerField(default=0)
 
     def is_full(self):
-        return self.filled_slots >= self.total_slots
+        return self.filled_slots >= self.department.total_slots
 
     def __str__(self):
         return f"{self.department.name} - {self.week_start_date}"

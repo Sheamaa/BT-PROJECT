@@ -19,6 +19,7 @@ urlpatterns = [
     path('student/upload-attendance/<int:app_id>/', views.student_upload_attendance, name='student_upload_attendance'),
     path('activities/', views.activities, name='activities'),
     path('workshops/upload-attendance/<int:reg_id>/', views.student_upload_workshop_attendance, name='student_upload_workshop_attendance'),
+    
     # Staff URLs
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
     path('staff/application/<int:app_id>/', views.staff_application_detail, name='staff_application_detail'),
@@ -42,5 +43,8 @@ urlpatterns = [
     path('staff/export/', views.export_approved_excel, name='export_approved_excel'),
     path('staff/students/', views.staff_students, name='staff_students'),
     path('staff/students/<int:student_id>/', views.staff_student_detail, name='staff_student_detail'),
-
+    path('staff/certificates/<int:cert_id>/edit/', views.staff_edit_certificate, name='staff_edit_certificate'),
+    path('staff/certificates/<int:cert_id>/delete/', views.staff_delete_certificate, name='staff_delete_certificate'),
+    path('staff/certificates/upload-workshop-attendance/<int:sheet_id>/', views.staff_upload_workshop_cert_from_attendance, name='staff_upload_workshop_cert_from_attendance'),
+    path('staff/certificates/verify-workshop-attendance/<int:sheet_id>/', views.staff_verify_workshop_attendance, name='staff_verify_workshop_attendance'),
 ]

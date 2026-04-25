@@ -86,8 +86,7 @@
                         </svg>
                         <div>
                             <p class="certificate-label">Certificate Issued</p>
-                            <p class="certificate-meta">{{ app.certificate.hours }} hrs — {{
-                                app.certificate.start_date|date:"M d, Y" }}</p>
+                            <p class="certificate-meta">{{ app.certificate.hours }} hrs — {{app.certificate.start_date|date:"M d, Y" }}</p>
                         </div>
                     </div>
                     <a href="{{ app.certificate.certificate_file.url }}" target="_blank" class="download-cert-btn">
@@ -175,8 +174,7 @@
                 <div class="activity-card-header">
                     <div class="activity-card-info">
                         <h3 class="activity-name">{{ reg.workshop.name }}</h3>
-                        <p class="activity-meta">{{ reg.workshop.start_date|date:"M d" }} — {{
-                            reg.workshop.end_date|date:"M d, Y" }}</p>
+                        <p class="activity-meta">{{ reg.workshop.start_date|date:"M d" }} — {{reg.workshop.end_date|date:"M d, Y" }}</p>
                         <p class="activity-meta">{{ reg.workshop.timings }}</p>
                         <p class="activity-meta">Registered {{ reg.registered_at|date:"M d, Y" }}</p>
                     </div>
@@ -196,8 +194,7 @@
                         </svg>
                         <div>
                             <p class="certificate-label">Certificate Issued</p>
-                            <p class="certificate-meta">{{ reg.certificate.hours }} hrs — {{
-                                reg.certificate.start_date|date:"M d, Y" }}</p>
+                            <p class="certificate-meta">{{ reg.certificate.hours }} hrs — {{reg.certificate.start_date|date:"M d, Y" }}</p>
                         </div>
                     </div>
                     <a href="{{ reg.certificate.certificate_file.url }}" target="_blank" class="download-cert-btn">

@@ -34,6 +34,7 @@
                     <th>Area</th>
                     <th>Supervisor</th>
                     <th>Eligibility</th>
+                    <th>Weekly Capacity</th>
                     <th>Evening Shift</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -53,6 +54,9 @@
                             class="status-badge {% if dept.eligibility == 'highschool' %}status-submitted{% else %}status-approved{% endif %}">
                             {{ dept.get_eligibility_display }}
                         </span>
+                    </td>
+                    <td>
+                       {{ dept.total_slots }}
                     </td>
                     <td>{% if dept.has_evening_shift %}Yes{% else %}No{% endif %}</td>
                     <td>

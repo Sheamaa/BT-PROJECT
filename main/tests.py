@@ -48,7 +48,7 @@ def create_staff_user(username='staff1', email='staff1@test.com', password='test
     return user
 
 
-def create_department(name='Test Department', area='doha', eligibility='undergraduate'):
+def create_department(name='Test Department', area='doha', eligibility='undergraduate', total_slots=5):
     return Department.objects.create(
         name=name,
         location='Doha',
@@ -56,17 +56,21 @@ def create_department(name='Test Department', area='doha', eligibility='undergra
         supervisor='Dr. Test',
         timings='Sun-Thu 8AM-2PM',
         eligibility=eligibility,
+        total_slots=total_slots,
         is_active=True
     )
 
 
-def create_weekly_slot(department, week_start=None, total=5, filled=0):
+def create_weekly_slot(department, week_start=None, filled=0):
     if week_start is None:
-        week_start = date.today() + timedelta(days=(6 - date.today().weekday()))
+        today = date.today()
+        days = (6 - today.weekday()) % 7
+        if days == 0:
+            days = 7
+        week_start = today + timedelta(days=days)
     return DepartmentWeeklySlot.objects.create(
         department=department,
         week_start_date=week_start,
-        total_slots=total,
         filled_slots=filled
     )
 
@@ -556,8 +560,8 @@ class StaffViewTest(TestCase):
         student_user, student_profile = create_student_user(
             username='student4', email='student4@test.com'
         )
-        dept = create_department()
-        slot = create_weekly_slot(dept, total=5, filled=5)
+        dept = create_department(total_slots=5)
+        slot = create_weekly_slot(dept, filled=5)
         app = Application.objects.create(
             student=student_profile,
             first_choice_dept=dept,
@@ -693,61 +697,59 @@ class NotificationTest(TestCase):
         self.user, self.profile = create_student_user()
         self.client.login(username='student1', password='testpass123')
 
-def test_notification_created_on_application_submit(self):
-    dept = create_department()
+    
 
-    today = date.today()
-    days_until_sunday = (6 - today.weekday()) % 7
-    if days_until_sunday == 0:
-        days_until_sunday = 7
-    next_sunday = today + timedelta(days=days_until_sunday)
+    def test_notification_created_on_application_submit(self):
+        dept = create_department()
 
-    slot = DepartmentWeeklySlot.objects.create(
-        department=dept,
-        week_start_date=next_sunday,
-        total_slots=5,
-        filled_slots=0
-    )
+        today = date.today()
+        days_until_sunday = (6 - today.weekday()) % 7
+        if days_until_sunday == 0:
+            days_until_sunday = 7
+        next_sunday = today + timedelta(days=days_until_sunday)
 
-
-    self.profile.qid = '28734901234'
-    self.profile.phone = '+974 5512 3456'
-    self.profile.save()
-
-    response = self.client.post(reverse('apply'), {
-        'first_choice_dept': str(dept.id),
-        'preferred_week': str(next_sunday),
-    })
-
-    # print response for debugging if needed
-    print(f"Response status: {response.status_code}")
-    print(f"Messages: {[str(m) for m in response.wsgi_request._messages]}")
-
-    self.assertTrue(
-        Notification.objects.filter(
-            user=self.user,
-            type='application_submitted'
-        ).exists()
-    )
-
-      
-
-    def test_mark_all_notifications_read(self):
-        Notification.objects.create(
-            user=self.user,
-            message='Test 1',
-            type='general',
-            is_read=False
+        slot = DepartmentWeeklySlot.objects.create(
+            department=dept,
+            week_start_date=next_sunday,
+            total_slots=5,
+            filled_slots=0
         )
-        Notification.objects.create(
-            user=self.user,
-            message='Test 2',
-            type='general',
-            is_read=False
+
+
+        response = self.client.post(reverse('apply'), {
+            'first_choice_dept': str(dept.id),
+            'preferred_week': str(next_sunday),
+        })
+
+        print(f"Response status: {response.status_code}")
+        print(f"Messages: {[str(m) for m in response.wsgi_request._messages]}")
+
+        self.assertTrue(
+            Notification.objects.filter(
+                user=self.user,
+                type='application_submitted',
+                is_read=False
+            ).exists()
         )
-        self.client.get(reverse('mark_all_read'))
-        unread = Notification.objects.filter(
-            user=self.user,
-            is_read=False
-        ).count()
-        self.assertEqual(unread, 0)
+
+
+        def test_mark_all_notifications_read(self):
+            Notification.objects.create(
+                user=self.user,
+                message='Test 1',
+                type='general',
+                is_read=False
+            )
+            print(self.user)
+            Notification.objects.create(
+                user=self.user,
+                message='Test 2',
+                type='general',
+                is_read=False
+            )
+            self.client.get(reverse('mark_all_read'))
+            unread = Notification.objects.filter(
+                user=self.user,
+                is_read=False
+            ).count()
+            self.assertEqual(unread, 0)

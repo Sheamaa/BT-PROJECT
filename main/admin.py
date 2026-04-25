@@ -25,11 +25,11 @@ class StaffProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'location', 'supervisor', 'timings', 'is_active']
+    list_display = ['name', 'location', 'supervisor', 'timings', 'total_slots', 'is_active']
 
 @admin.register(DepartmentWeeklySlot)
 class DepartmentWeeklySlotAdmin(admin.ModelAdmin):
-    list_display = ['department', 'week_start_date', 'total_slots', 'filled_slots']
+    list_display = ['department', 'week_start_date', 'filled_slots']
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
