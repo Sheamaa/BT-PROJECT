@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}HPAP Volunteering{% endblock %}</title>
+    <title>{% block title %}Volunteering{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -22,8 +22,8 @@
     <div class="header-content">
         <div class="header-left">
             <a href="{% url 'dashboard' %}" class="logo">
-                <div class="logo-icon">H</div>
-                <span class="logo-text">HPAP</span>
+                <div class="logo-icon">V</div>
+                <span class="logo-text">Volunteering</span>
             </a>
             <nav class="nav">
                 {% if request.user.role == 'staff' %}
