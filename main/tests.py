@@ -8,6 +8,7 @@ from .models import (
     Notification, Workshop, WorkshopRegistration
 )
 from .decision_tree import get_recommendation, build_tree, traverse_tree, DecisionNode, LeafNode
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 # ══════════════════════════════════════════
@@ -21,6 +22,11 @@ def create_student_user(username='student1', email='student1@test.com', password
         password=password,
         role='student'
     )
+
+    dummy_pdf = SimpleUploadedFile(
+        name="test.pdf",
+        content=b"Dummy PDF content"
+    )
     profile = StudentProfile.objects.create(
         user=user,
         full_name='Test Student',
@@ -29,6 +35,8 @@ def create_student_user(username='student1', email='student1@test.com', password
         institution='Qatar University',
         phone='+974 5512 3456',
         qid='28734901234',
+        qid_expiry_date=date.today() + timedelta(days=365),
+        id_document=dummy_pdf
     )
     return user, profile
 
@@ -119,13 +127,13 @@ class DepartmentModelTest(TestCase):
 class DepartmentWeeklySlotTest(TestCase):
 
     def test_slot_not_full(self):
-        dept = create_department()
-        slot = create_weekly_slot(dept, total=5, filled=3)
+        dept = create_department(total_slots=5)
+        slot = create_weekly_slot(dept, filled=3)
         self.assertFalse(slot.is_full())
 
     def test_slot_is_full(self):
-        dept = create_department()
-        slot = create_weekly_slot(dept, total=5, filled=5)
+        dept = create_department(total_slots=5)
+        slot = create_weekly_slot(dept, filled=5)
         self.assertTrue(slot.is_full())
 
     def test_slot_str(self):
@@ -600,7 +608,6 @@ class ApplicationLogicTest(TestCase):
         slot2 = DepartmentWeeklySlot.objects.create(
             department=self.dept,
             week_start_date=next_sunday,
-            total_slots=5,
             filled_slots=0
         )
         response = self.client.post(reverse('apply'), {
@@ -711,7 +718,6 @@ class NotificationTest(TestCase):
         slot = DepartmentWeeklySlot.objects.create(
             department=dept,
             week_start_date=next_sunday,
-            total_slots=5,
             filled_slots=0
         )
 
@@ -721,8 +727,6 @@ class NotificationTest(TestCase):
             'preferred_week': str(next_sunday),
         })
 
-        print(f"Response status: {response.status_code}")
-        print(f"Messages: {[str(m) for m in response.wsgi_request._messages]}")
 
         self.assertTrue(
             Notification.objects.filter(
@@ -733,23 +737,23 @@ class NotificationTest(TestCase):
         )
 
 
-        def test_mark_all_notifications_read(self):
-            Notification.objects.create(
-                user=self.user,
-                message='Test 1',
-                type='general',
-                is_read=False
-            )
-            print(self.user)
-            Notification.objects.create(
-                user=self.user,
-                message='Test 2',
-                type='general',
-                is_read=False
-            )
-            self.client.get(reverse('mark_all_read'))
-            unread = Notification.objects.filter(
-                user=self.user,
-                is_read=False
-            ).count()
-            self.assertEqual(unread, 0)
+    def test_mark_all_notifications_read(self):
+        Notification.objects.create(
+            user=self.user,
+            message='Test 1',
+            type='general',
+            is_read=False
+        )
+
+        Notification.objects.create(
+            user=self.user,
+            message='Test 2',
+            type='general',
+            is_read=False
+        )
+        self.client.get(reverse('mark_all_read'))
+        unread = Notification.objects.filter(
+            user=self.user,
+            is_read=False
+        ).count()
+        self.assertEqual(unread, 0)

@@ -201,16 +201,36 @@ def apply(request):
             messages.error(request, 'Please select a preferred week.')
             return redirect('apply')
 
-        # check if student already has an active application
-        active_application = Application.objects.filter(
+        # check if student already has any application for the same week
+        same_week_application = Application.objects.filter(
             student=profile,
+            preferred_slot__week_start_date=week_date,
             status__in=['submitted', 'approved']
         ).first()
 
-        if active_application and active_application.preferred_slot == preferred_week:
-            messages.error(request, 'You already have an active application for this week. You may choose another week where you are free.')
-            return redirect('dashboard')
+        if same_week_application:
+            messages.error(
+                request,
+                f'You already have an application for the week of {week_date.strftime("%B %d, %Y")}. You cannot submit two applications for the same week.'
+            )
+            return redirect('apply')
 
+
+        # check if student already has an active approved placement
+        active_approved = Application.objects.filter(
+            student=profile,
+            status='approved'
+        ).exclude(
+            approved_department__isnull=True
+        ).first()
+
+        if active_approved:
+            messages.error(
+                request,
+                f'You already have an active approved placement at {active_approved.approved_department.name}. You cannot apply while one is still active.'
+            )
+            return redirect('dashboard')
+            
         # get or create the weekly slot
         first_dept = Department.objects.get(id=first_choice_id)
         slot, created = DepartmentWeeklySlot.objects.get_or_create(
@@ -1255,3 +1275,13 @@ def staff_student_detail(request, student_id):
         'workshop_registrations': workshop_registrations,
         'total_hours': total_hours,
     })
+
+
+    def error_404(request, exception):
+        return render(request, '404.html', status=404)
+
+    def error_500(request):
+        return render(request, '500.html', status=500)
+
+    def error_403(request, exception):
+        return render(request, '403.html', status=403)

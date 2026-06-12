@@ -168,12 +168,7 @@
             </table>
         </div>
     
-        <div class="total-hours-row">
-            Total hours:
-            <strong>
-                {% for cert in certificates %}{% if forloop.last %}{{ cert.hours }}{% endif %}{% endfor %}
-            </strong>
-        </div>
+       
     
         {% else %}
         <div class="empty-state">
